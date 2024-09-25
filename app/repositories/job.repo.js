@@ -1,5 +1,6 @@
 // REPOSITORIES: operaciones con la base de datos
 const jobModel = require('../models/job.model.js');
+const { isNotUndefined } = require('../shared/utils/utils.js');
 
 // CREATE
 const createJob = async (data) => {
@@ -13,8 +14,30 @@ const findOneJob = async (params) => {
 };
 
 // FIND ALL
-const findAllJobs = async () => {
-    return await jobModel.find();
+const findAllJobs = async (params) => {
+
+    let { limit, offset, category, name, salary_min, salary_max } = params;
+    const name_regex = new RegExp(name);
+
+    limit = isNotUndefined(limit) ? parseInt(limit) : 3;
+    offset = isNotUndefined(offset) ? parseInt(offset) : 0;
+    category = isNotUndefined(category) ? category : "";
+    name = isNotUndefined(name) ? name : "";
+    salary_min = isNotUndefined(salary_min) ? salary_min : 0;
+    salary_max = isNotUndefined(salary_max) ? salary_max : 999999;
+
+    console.log(params);
+
+    query = {
+        name: { $regex: name_regex },
+        $and: [{ salary: { $gte: salary_min } }, { salary: { $lte: salary_max } }]
+    };
+
+    category != "" && (query.id_cat = category);
+
+    const jobs = await jobModel.find(query).limit(Number(limit)).skip(Number(offset));
+    const job_count = await jobModel.find(query).count();
+    return { jobs, job_count };
 };
 
 // GET JOBS BY CATEGORY
@@ -34,7 +57,7 @@ const updateJob = async (params, updateData) => {
         job.description = description || job.description;
         job.img = img || job.img;
         job.images = images || job.images;
-    
+
         return await job.save();
     }
 

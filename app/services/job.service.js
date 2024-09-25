@@ -14,7 +14,7 @@ const createJob = async (data) => {
     };
 
     const id_cat = data.id_cat;
-    const category = await categoryRepo.findOneCategory({id_cat});
+    const category = await categoryRepo.findOneCategory({ id_cat });
 
     if (!category) {
         return { message: "Categoria no encontrada" };
@@ -42,16 +42,19 @@ const findOneJob = async (params) => {
 };
 
 // FIND ALL
-const findAllJobs = async () => {
-    const jobs = await jobRepo.findAllJobs();
+const findAllJobs = async (params) => {
+    const { jobs, job_count } = await jobRepo.findAllJobs(params);
 
     if (!jobs) {
         return { message: "No se encontraron trabajos" };
     }
 
-    return await Promise.all(jobs.map(async job => {
-        return await job.toJobResponse();
-    }));
+    return {
+        jobs: await Promise.all(jobs.map(async job => {
+            return await job.toJobResponse();
+        })),
+        job_count
+    };
 };
 
 // GET JOBS BY CATEGORY
@@ -88,7 +91,7 @@ const deleteOneJob = async (params) => {
     }
 
     const id_cat = job.id_cat;
-    const category = await categoryRepo.findOneCategory({id_cat});
+    const category = await categoryRepo.findOneCategory({ id_cat });
 
     if (category) {
         await category.removeJob(job._id) // metodo en category.model.js, elimina trabajo del array de categoria
