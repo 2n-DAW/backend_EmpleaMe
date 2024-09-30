@@ -16,12 +16,15 @@ const findOneJob = async (params) => {
 // FIND ALL
 const findAllJobs = async (params) => {
 
-    let { limit, offset, category, name, salary_min, salary_max } = params;
+    let { limit, offset, category, contract, workingDay, province, name, salary_min, salary_max } = params;
     const name_regex = new RegExp(name);
 
     limit = isNotUndefined(limit) ? parseInt(limit) : 3;
     offset = isNotUndefined(offset) ? parseInt(offset) : 0;
     category = isNotUndefined(category) ? category : "";
+    contract = isNotUndefined(contract) ? contract : "";
+    workingDay = isNotUndefined(workingDay) ? workingDay : "";
+    province = isNotUndefined(province) ? province : "";
     name = isNotUndefined(name) ? name : "";
     salary_min = isNotUndefined(salary_min) ? salary_min : 0;
     salary_max = isNotUndefined(salary_max) ? salary_max : 999999;
@@ -34,6 +37,9 @@ const findAllJobs = async (params) => {
     };
 
     category != "" && (query.id_cat = category);
+    contract != "" && (query.id_contract = contract);
+    workingDay != "" && (query.id_workingDay = workingDay);
+    province != "" && (query.id_province = province);
 
     const jobs = await jobModel.find(query).limit(Number(limit)).skip(Number(offset));
     const job_count = await jobModel.find(query).count();

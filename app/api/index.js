@@ -44,9 +44,10 @@ mongoose.connect(dbConfig.url, {
     process.exit();
 });
 
-require('../routes/category.routes')(app);
-require('../routes/job.routes')(app);
-require('../routes/carousel.routes')(app);
+// require('../routes/category.routes')(app);
+['category', 'job', 'carousel', 'contract', 'workingDay', 'province'].forEach(
+    route => require(`../routes/${route}.routes`)(app)
+);
 
 
 app.listen(PORT, () => {
