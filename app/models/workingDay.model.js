@@ -17,7 +17,6 @@ workingDay_schema.plugin(uniqueValidator, { msg: "already taken" });
 
 workingDay_schema.methods.toWorkingDayResponse = function() {
     return {
-        id: this._id,
         id_workingDay: this.id_workingDay,
         workingDay_name: this.workingDay_name
     };

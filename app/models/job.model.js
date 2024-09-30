@@ -23,21 +23,6 @@ const JobSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    contract: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Contract',
-        required: true
-    },
-    working_day: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'WorkingDay',
-        required: true
-    },
-    province: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Province',
-        required: true
-    }, 
     salary: {
         type: Number,
         required: true
@@ -51,7 +36,19 @@ const JobSchema = mongoose.Schema({
     id_cat: {
         type: String,
         required: false
-    }
+    },
+    id_contract: {
+        type: String,
+        required: false
+    },
+    id_workingDay: {
+        type: String,
+        required: false
+    },
+    id_province: {
+        type: String,
+        required: false
+    },
 },
 {
     timestamps: true
@@ -73,17 +70,17 @@ JobSchema.methods.slugify = async function () {
 };
 
 JobSchema.methods.toJobResponse = async function () {
-    const contractObj = await Contract.findById(this.contract);
-    const workingDayObj = await WorkingDay.findById(this.working_day);
-    const provinceObj = await Province.findById(this.province);
+    // const contractObj = await Contract.findById(this.id_contractcontract);
+    // const workingDayObj = await WorkingDay.findById(this.id_working_day);
+    // const provinceObj = await Province.findById(this.id_province);
     return {
         slug: this.slug,
         name: this.name,
         author: this.author,
         description: this.description,
-        contract: contractObj.toContractJSON(),
-        working_day: workingDayObj.toWorkingDayJSON(),
-        province: provinceObj.toProvinceJSON(),
+        id_contract: this.id_contract,
+        id_workingDay: this.id_workingDay,
+        id_province: this.id_province,
         salary: this.salary,
         images: this.images,
         img: this.img,
@@ -93,23 +90,23 @@ JobSchema.methods.toJobResponse = async function () {
     }
 }
 
-JobSchema.methods.toAllJobResponse = async function () {
-    return {
-        slug: this.slug,
-        name: this.name,
-        author: this.author,
-        description: this.description,
-        contract: this.contract,
-        working_day: this.working_day,
-        province: this.province,
-        salary: this.salary,
-        images: this.images,
-        img: this.img,
-        id_cat: this.id_cat,
-        createdAt: this.createdAt,
-        updatedAt: this.updatedAt
-    }
-}
+// JobSchema.methods.toAllJobResponse = async function () {
+//     return {
+//         slug: this.slug,
+//         name: this.name,
+//         author: this.author,
+//         description: this.description,
+//         contract: this.contract,
+//         working_day: this.working_day,
+//         province: this.province,
+//         salary: this.salary,
+//         images: this.images,
+//         img: this.img,
+//         id_cat: this.id_cat,
+//         createdAt: this.createdAt,
+//         updatedAt: this.updatedAt
+//     }
+// }
 
 JobSchema.methods.toJobCarouselResponse = async function () {
     return {

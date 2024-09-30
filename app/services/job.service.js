@@ -11,13 +11,13 @@ const createJob = async (data) => {
         name: data.name || null,
         author: data.author || null,
         description: data.description || null,
-        contract: data.contract || null,
-        working_day: data.working_day || null,
-        province: data.province || null,
         salary: data.salary || null,
         images: data.images,
         img: data.img || null,
         id_cat: data.id_cat || null,
+        id_contract: data.id_contract || null,
+        id_workingDay: data.id_workingDay || null,
+        id_province: data.id_province || null
     };
 
     // comprueba si existe el id de categoria en su respectiva colección
@@ -28,25 +28,25 @@ const createJob = async (data) => {
     }
 
     // comprueba si existe el id de contrato en su respectiva colección
-    const id_contract = data.contract;
-    const contract = await contractRepo.findContractId(id_contract);
-    if (!contract) {
-        return { message: "Contrato no encontrado" };
-    }
+    // const id_contract = data.contract;
+    // const contract = await contractRepo.findContractId(id_contract);
+    // if (!contract) {
+    //     return { message: "Contrato no encontrado" };
+    // }
 
     // comprueba si existe el id de workingDay en su respectiva colección
-    const id_workingDay = data.working_day;
-    const workingDay = await workingDayRepo.findWorkingDayId(id_workingDay);
-    if (!workingDay) {
-        return { message: "Jornada no encontrada" };
-    }
+    // const id_workingDay = data.working_day;
+    // const workingDay = await workingDayRepo.findWorkingDayId(id_workingDay);
+    // if (!workingDay) {
+    //     return { message: "Jornada no encontrada" };
+    // }
 
     // comprueba si existe el id de province en su respectiva colección
-    const id_province = data.province;
-    const province = await provinceRepo.findProvinceId(id_province);
-    if (!province) {
-        return { message: "Provincia no encontrada" };
-    }
+    // const id_province = data.province;
+    // const province = await provinceRepo.findProvinceId(id_province);
+    // if (!province) {
+    //     return { message: "Provincia no encontrada" };
+    // }
 
     const newJob = await jobRepo.createJob(job_data);
 
@@ -79,7 +79,7 @@ const findAllJobs = async (params) => {
 
     return {
         jobs: await Promise.all(jobs.map(async job => {
-            return await job.toAllJobResponse();
+            return await job.toJobResponse();
         })),
         job_count
     };
@@ -95,7 +95,7 @@ const getJobsByCategory = async (params) => {
 
     return await Promise.all(category.jobs.map(async jobId => {
         const jobObj = await jobRepo.getJobsByCategory(jobId);
-        return await jobObj.toAllJobResponse();
+        return await jobObj.toJobResponse();
     }))
 };
 

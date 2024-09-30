@@ -17,7 +17,6 @@ contract_schema.plugin(uniqueValidator, { msg: "already taken" });
 
 contract_schema.methods.toContractResponse = function() {
     return {
-        id: this._id,
         id_contract: this.id_contract,
         contract_name: this.contract_name
     };

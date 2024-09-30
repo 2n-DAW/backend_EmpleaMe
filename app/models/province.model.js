@@ -17,7 +17,6 @@ province_schema.plugin(uniqueValidator, { msg: "already taken" });
 
 province_schema.methods.toProvinceResponse = function() {
     return {
-        id: this._id,
         id_province: this.id_province,
         province_name: this.province_name
     };

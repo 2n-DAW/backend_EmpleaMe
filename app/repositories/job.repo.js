@@ -41,9 +41,7 @@ const findAllJobs = async (params) => {
     workingDay != "" && (query.id_workingDay = workingDay);
     province != "" && (query.id_province = province);
 
-    const jobs = await jobModel.find(query).populate('contract', 'id_contract contract_name -_id')
-        .populate('working_day', 'id_workingDay workingDay_name -_id').populate('province', 'id_province province_name -_id')
-        .limit(Number(limit)).skip(Number(offset));
+    const jobs = await jobModel.find(query).limit(Number(limit)).skip(Number(offset));
     const job_count = await jobModel.find(query).count();
     return { jobs, job_count };
 };
