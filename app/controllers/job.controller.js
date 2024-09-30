@@ -1,7 +1,7 @@
 // CONTROLLERS: manejan las solicitudes HTTP, reciben las request y emiten la respuesta
 const jobService = require("../services/job.service.js");
- // EXPRESS-ASYNC-HANDLER captura los errores generados en operaciones asíncronas y los pasa al midleware de express
- // no es necesario utilizar los try ... catch
+// EXPRESS-ASYNC-HANDLER captura los errores generados en operaciones asíncronas y los pasa al midleware de express
+// no es necesario utilizar los try ... catch
 const asyncHandler = require('express-async-handler');
 
 // CREATE
@@ -15,21 +15,22 @@ const createJob = asyncHandler(async (req, res) => {
 const findOneJob = asyncHandler(async (req, res) => {
     const job = await jobService.findOneJob(req.params);
 
-    return res.status(200).json({job: job});
+    return res.status(200).json({ job: job });
 });
 
 // FIND ALL
 const findAllJobs = asyncHandler(async (req, res) => {
-    const jobs = await jobService.findAllJobs();
+    console.log(req.query);
+    const { jobs, job_count } = await jobService.findAllJobs(req.query);
 
-    return res.status(200).json({jobs: jobs});
+    return res.status(200).json({ jobs, job_count });
 });
 
 // GET JOBS BY CATEGORY
 const getJobsByCategory = asyncHandler(async (req, res) => {
     const jobs = await jobService.getJobsByCategory(req.params);
 
-    return res.status(200).json({jobs: jobs});
+    return res.status(200).json({ jobs: jobs });
 });
 
 // UPDATE
