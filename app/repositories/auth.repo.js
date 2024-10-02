@@ -8,19 +8,23 @@ const userLogin = async (params) => {
 };
 
 const registerUser = async (params) => {
-    return await authModel.findOne(params);
+    return await User.create(params);
 };
 
 const getCurrentUser = async (params) => {
-    return await authModel.findOne(params);
+    return await User.findOne(params);
 };
 
 const updateUser = async (params) => {
-    return await authModel.findOne(params);
+    return await User.findOne(params);
 };
 
 const comparePassword = async (password, hash) => {
     return await bcrypt.compare(password, hash);
+};
+
+const hashPassword = async (password, salt) => {
+    return await bcrypt.hash(password, salt);
 };
 
 module.exports = {
@@ -28,5 +32,6 @@ module.exports = {
     registerUser,
     getCurrentUser,
     updateUser,
-    comparePassword
+    comparePassword,
+    hashPassword
 }
