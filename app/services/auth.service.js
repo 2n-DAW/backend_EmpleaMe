@@ -1,8 +1,8 @@
-const userRepo = require("../repositories/user.repo.js");
+const authRepo = require("../repositories/auth.repo.js");
 
 
 const userLogin = async () => {
-    const user = await userRepo.userLogin();
+    const user = await authRepo.userLogin();
 
     if (!user) {
         return { message: "No se encontraron categorías" };
@@ -14,7 +14,7 @@ const userLogin = async () => {
 };
 
 const registerUser = async () => {
-    const user = await userRepo.registerUser();
+    const user = await authRepo.registerUser();
 
     if (!user) {
         return { message: "No se encontraron categorías" };
@@ -24,7 +24,7 @@ const registerUser = async () => {
 };
 
 const getCurrentUser = async () => {
-    const user = await userRepo.getCurrentUser();
+    const user = await authRepo.getCurrentUser();
 
     if (!user) {
         return { message: "No se encontraron categorías" };
@@ -36,7 +36,7 @@ const getCurrentUser = async () => {
 };
 
 const updateUser = async () => {
-    const user = await userRepo.updateUser();
+    const user = await authRepo.updateUser();
 
     if (!user) {
         return { message: "No se encontraron categorías" };

@@ -1,5 +1,5 @@
 module.exports = (app) => {
-    const { userLogin, registerUser, getCurrentUser, updateUser } = require('../controllers/user.controller.js');
+    const { userLogin, registerUser, getCurrentUser, updateUser } = require('../controllers/auth.controller.js');
     const { verifyJWT } = require('../middlewares/auth.middleware.js');
 
 
