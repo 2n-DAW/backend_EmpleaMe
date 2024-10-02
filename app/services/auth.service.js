@@ -1,16 +1,25 @@
 const authRepo = require("../repositories/auth.repo.js");
 
 
-const userLogin = async () => {
-    const user = await authRepo.userLogin();
+const userLogin = async (params) => {
+    const { user } = params;
 
-    if (!user) {
-        return { message: "No se encontraron categorías" };
+    if (!user || !user.email || !user.password) {
+        return { message: "All fields are required" };
     }
 
-    return await Promise.all(user.map(async category => {
-        return await category.toCategoryCarouselResponse();
-    }));
+    const loginUser = await authRepo.userLogin({ email: user.email });
+
+    if (!loginUser) {
+        return { message: "User not found" };
+    }
+
+    const match = await authRepo.comparePassword(user.password, loginUser.password);
+    if (!match) {
+        return { message: "Invalid credentials" };
+    }
+
+    return loginUser.toUserResponse();
 };
 
 const registerUser = async () => {
