@@ -1,36 +1,31 @@
 const authRepo = require("../repositories/auth.repo.js");
-
+const { resp } = require("../utils/utils.js");
 
 const userLogin = async (params) => {
-    console.log(params);
     const { user } = params;
-    console.log(user);
     if (!user || !user.email || !user.password) {
-        return { message: "All fields are required" };
+        return resp(400, { message: "All fields are required" });
     }
 
     const loginUser = await authRepo.userLogin({ email: user.email });
     if (!loginUser) {
-        return { message: "User not found" };
+        return resp(404, { message: "User Not Found" });
     }
 
     const match = await authRepo.comparePassword(user.password, loginUser.password);
     if (!match) {
-        return { message: "Invalid credentials" };
+        return resp(401, { message: "Invalid Password" });
     }
 
-    return loginUser.toUserResponse();
+    return resp(200, { user: loginUser.toUserResponse() });
 };
 
 
 const registerUser = async (params) => {
-    // console.log(params);
     const { user } = params;
 
-    //console.log(user);
-
     if (!user || !user.email || !user.username || !user.password) {
-        return { message: "All fields are required" };
+        return resp(400, { message: "All fields are required" });
     }
 
     const hashedPassword = await authRepo.hashPassword(user.password, 10);
@@ -44,13 +39,9 @@ const registerUser = async (params) => {
     const newUser = await authRepo.registerUser(userObject);
 
     if (newUser) {
-        return { user: newUser.toUserResponse() };
+        return resp(201, { user: newUser.toUserResponse() });
     } else {
-        return {
-            errors: {
-                body: "Unable to register a user"
-            }
-        };
+        return resp(400, { message: "User Registration Failed" });
     }
 }
 
@@ -58,30 +49,56 @@ const registerUser = async (params) => {
 
 
 
-const getCurrentUser = async () => {
-    const user = await authRepo.getCurrentUser();
+const getCurrentUser = async (email) => {
+
+    const user = await authRepo.getCurrentUser(email);
 
     if (!user) {
-        return { message: "No se encontraron categorías" };
+        return { status: 404, result: { message: "User Not Found" } };
     }
 
-    return await Promise.all(user.map(async category => {
-        return await category.toCategoryCarouselResponse();
-    }));
+    return resp(200, { user: user.toUserResponse() });
 };
 
-const updateUser = async () => {
-    const user = await authRepo.updateUser();
 
+
+
+
+
+const updateUser = async (req) => {
+
+    const { user } = req.body;
+    console.log(user);
     if (!user) {
-        return { message: "No se encontraron categorías" };
+        return resp(400, { message: "Required a User object" });
     }
 
-    return await Promise.all(user.map(async category => {
-        return await category.toCategoryCarouselResponse();
-    }));
-};
+    const email = req.userEmail;
+    const target = await authRepo.findOneUser({ email });
 
+
+    if (user.email) {
+        target.email = user.email;
+    }
+    if (user.username) {
+        target.username = user.username;
+    }
+    if (user.password) {
+        const hashedPwd = await authRepo.hashPassword(user.password, 10);
+        target.password = hashedPwd;
+    }
+    if (typeof user.image !== 'undefined') {
+        target.image = user.image;
+    }
+    if (typeof user.bio !== 'undefined') {
+        target.bio = user.bio;
+    }
+
+    await authRepo.updateUser(target);
+
+    return resp(200, { user: target.toUserResponse() });
+
+};
 
 module.exports = {
     userLogin,

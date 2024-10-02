@@ -4,25 +4,23 @@ const asyncHandler = require('express-async-handler');
 
 
 const userLogin = asyncHandler(async (req, res) => {
-    const result = await authService.userLogin(req.body);
-    return res.status(201).json(result);
+    const { status, result } = await authService.userLogin(req.body);
+    return res.status(status).json(result);
 });
 
 const registerUser = asyncHandler(async (req, res) => {
-    console.log(req.body);
-    const result = await authService.registerUser(req.body);
-
-    return res.status(201).json(result);
+    const { status, result } = await authService.registerUser(req.body);
+    return res.status(status).json(result);
 });
 
 const getCurrentUser = asyncHandler(async (req, res) => {
-    const result = await authService.updateUser(req.body);
-    return res.status(201).json(result);
+    const { status, result } = await authService.getCurrentUser(req.userEmail);
+    return res.status(status).json(result);
 });
 
 const updateUser = asyncHandler(async (req, res) => {
-    const result = await authService.updateUser(req.body);
-    return res.status(201).json(result);
+    const { status, result } = await authService.updateUser(req);
+    return res.status(status).json(result);
 });
 
 
