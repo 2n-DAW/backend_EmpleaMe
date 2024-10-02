@@ -9,6 +9,9 @@ const followUser = async (loginUser, user_id) => {
     loginUser.follow(user_id);
 };
 
+const unFollowUser = async (loginUser, user_id) => {
+    loginUser.unfollow(user_id);
+};
 
 
 
@@ -16,5 +19,6 @@ const followUser = async (loginUser, user_id) => {
 
 module.exports = {
     getProfile,
-    followUser
+    followUser,
+    unFollowUser
 }

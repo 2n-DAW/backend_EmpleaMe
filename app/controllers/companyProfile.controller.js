@@ -18,9 +18,15 @@ const getCurrentUser = asyncHandler(async (req, res) => {
     return res.status(status).json(result);
 });
 
+const unFollowUser = asyncHandler(async (req, res) => {
+    const { status, result } = await authService.unFollowUser(req);
+    return res.status(status).json(result);
+});
+
 
 module.exports = {
     getProfile,
     followUser,
-    getCurrentUser
+    getCurrentUser,
+    unFollowUser
 }

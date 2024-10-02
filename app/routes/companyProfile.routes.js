@@ -8,6 +8,6 @@ module.exports = (app) => {
 
     app.post('/:username/follow', verifyJWT, followUser);
 
-    //app.delete('/:username/follow', verifyJWT, unFollowUser);
+    app.delete('/:username/unfollow', verifyJWT, unFollowUser);
 
 }
