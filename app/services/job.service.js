@@ -4,12 +4,12 @@ const categoryRepo = require('../repositories/category.repo.js');
 const contractRepo = require('../repositories/contract.repo.js');
 const workingDayRepo = require('../repositories/workingDay.repo.js');
 const provinceRepo = require('../repositories/province.repo.js');
+const authRepo = require('../repositories/auth.repo.js');
 
 // CREATE
-const createJob = async (data) => {
+const createJob = async (req, data) => {
     const job_data = {
         name: data.name || null,
-        author: data.author || null,
         description: data.description || null,
         salary: data.salary || null,
         images: data.images,
@@ -19,6 +19,9 @@ const createJob = async (data) => {
         id_workingDay: data.id_workingDay || null,
         id_province: data.id_province || null
     };
+
+    const id = req.userId;
+    const author = await authRepo.findById(id);
 
     // comprueba si existe el id de categoria en su respectiva colección
     const id_cat = data.id_cat;
@@ -49,13 +52,14 @@ const createJob = async (data) => {
     // }
 
     const newJob = await jobRepo.createJob(job_data);
+    newJob.author = id;
 
     if (!newJob) { //si no se crea el trabajo
         return { message: "No se ha creado el trabajo" };
     }
 
     await category.addJob(newJob._id); //añadir trabajo a la categoría
-    return await newJob.toJobResponse();
+    return await newJob.toJobResponse(author);
 };
 
 // FIND ONE
@@ -69,9 +73,16 @@ const findOneJob = async (params) => {
     return await job.toJobResponse();
 };
 
-// FIND ALL
-const findAllJobs = async (params) => {
-    const { jobs, job_count } = await jobRepo.findAllJobs(params);
+// FEED ALL JOBS
+const feedAllJobs = async (req, params) => {
+    const userId = req.userId;
+    const loginUser = await authRepo.findById(userId);
+
+    if (!loginUser) {
+        return { message: "Usuario no encontrado" };
+    }
+
+    const { jobs, job_count } = await jobRepo.feedAllJobs(params, loginUser);
 
     if (!jobs) {
         return { message: "No se encontraron trabajos" };
@@ -79,10 +90,36 @@ const findAllJobs = async (params) => {
 
     return {
         jobs: await Promise.all(jobs.map(async job => {
-            return await job.toJobResponse();
+            return await job.toJobResponse(loginUser);
         })),
         job_count
     };
+};
+
+// LIST ALL JOBS
+const listAllJobs = async (req, params) => {
+    const { jobs, job_count } = await jobRepo.listAllJobs(params);
+
+    if (!jobs) {
+        return { message: "No se encontraron trabajos" };
+    }
+
+    if (req.loggedin) {
+        const loginUser = await authRepo.findById(req.userId);
+        return {
+            jobs: await Promise.all(jobs.map(async job => {
+                return await job.toJobResponse(loginUser);
+            })),
+            job_count
+        };
+    } else {
+        return {
+            jobs: await Promise.all(jobs.map(async job => {
+                return await job.toJobResponse(false);
+            })),
+            job_count
+        };
+    }
 };
 
 // GET JOBS BY CATEGORY
@@ -100,22 +137,36 @@ const getJobsByCategory = async (params) => {
 };
 
 // UPDATE
-const updateJob = async (params, data) => {
+const updateJob = async (req, params, data) => {
     const updatedJob = await jobRepo.updateJob(params, data);
 
     if (!updatedJob) {
         return { message: "Trabajo no encontrado" };
     }
 
-    return await updatedJob.toJobResponse();
+    const userId  = req.userId;
+    const loginUser = await authRepo.findById(userId);
+
+    if (!loginUser) {
+        return { message: "Usuario no encontrado" };
+    }
+
+    return await updatedJob.toJobResponse(loginUser);
 };
 
 // DELETE
-const deleteOneJob = async (params) => {
+const deleteOneJob = async (req, params) => {
     const job = await jobRepo.findOneJob(params);
 
     if (!job) {
         return { message: "Trabajo no encontrado" };
+    }
+
+    const userId  = req.userId;
+    const loginUser = await authRepo.findById(userId);
+
+    if (!loginUser) {
+        return { message: "Usuario no encontrado" };
     }
 
     const id_cat = job.id_cat;
@@ -125,14 +176,19 @@ const deleteOneJob = async (params) => {
         await category.removeJob(job._id) // metodo en category.model.js, elimina trabajo del array de categoria
     }
 
-    await jobRepo.deleteOneJob(params);
-    return { message: "Trabajo eliminado" };
+    if (job.author.toString() === loginUser._id.toString()) {
+        await jobRepo.deleteOneJob(params);
+        return { message: "Trabajo eliminado" };
+    } else {
+        return { message: "Solo la empresa responsable de la oferta de trabajo puede eliminarla" };
+    }
 };
 
 module.exports = {
     createJob,
     findOneJob,
-    findAllJobs,
+    feedAllJobs,
+    listAllJobs,
     updateJob,
     getJobsByCategory,
     deleteOneJob

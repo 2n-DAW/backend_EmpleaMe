@@ -6,9 +6,25 @@ const asyncHandler = require('express-async-handler');
 
 // CREATE
 const createJob = asyncHandler(async (req, res) => {
-    const newJob = await jobService.createJob(req.body);
+    const newJob = await jobService.createJob(req, req.body);
 
     return res.status(201).json(newJob)
+});
+
+// FEED ALL JOBS
+const feedAllJobs = asyncHandler(async (req, res) => {
+    console.log(req.query);
+    const { jobs, job_count } = await jobService.feedAllJobs(req, req.query);
+
+    return res.status(200).json({ jobs, job_count });
+});
+
+// LIST ALL JOBS
+const listAllJobs = asyncHandler(async (req, res) => {
+    console.log(req.query);
+    const { jobs, job_count } = await jobService.listAllJobs(req, req.query);
+
+    return res.status(200).json({ jobs, job_count });
 });
 
 // FIND ONE
@@ -16,14 +32,6 @@ const findOneJob = asyncHandler(async (req, res) => {
     const job = await jobService.findOneJob(req.params);
 
     return res.status(200).json({ job: job });
-});
-
-// FIND ALL
-const findAllJobs = asyncHandler(async (req, res) => {
-    console.log(req.query);
-    const { jobs, job_count } = await jobService.findAllJobs(req.query);
-
-    return res.status(200).json({ jobs, job_count });
 });
 
 // GET JOBS BY CATEGORY
@@ -35,14 +43,14 @@ const getJobsByCategory = asyncHandler(async (req, res) => {
 
 // UPDATE
 const updateJob = asyncHandler(async (req, res) => {
-    const updatedJob = await jobService.updateJob(req.params, req.body);
+    const updatedJob = await jobService.updateJob(req, req.params, req.body);
 
-    res.status(200).json(updatedJob);
+    return res.status(200).json(updatedJob);
 })
 
 // DELETE ONE
 const deleteOneJob = asyncHandler(async (req, res) => {
-    const result = await jobService.deleteOneJob(req.params);
+    const result = await jobService.deleteOneJob(req, req.params);
 
     return res.status(200).json(result);
 })
@@ -50,7 +58,8 @@ const deleteOneJob = asyncHandler(async (req, res) => {
 module.exports = {
     createJob,
     findOneJob,
-    findAllJobs,
+    feedAllJobs,
+    listAllJobs,
     updateJob,
     getJobsByCategory,
     deleteOneJob

@@ -4,6 +4,7 @@ const uniqueValidator = require('mongoose-unique-validator');
 const Contract = require("./contract.model");
 const WorkingDay = require("./workingDay.model");
 const Province = require("./province.model");
+const Auth = require("./auth.model");
 
 const JobSchema = mongoose.Schema({
     slug: {
@@ -15,9 +16,13 @@ const JobSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    // author: {
+    //     type: String,
+    //     required: true
+    // },
     author: {
-        type: String,
-        required: true
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Auth'
     },
     description: {
         type: String,
@@ -65,11 +70,12 @@ JobSchema.pre('validate', async function (next) {
     next();
 });
 
-JobSchema.methods.slugify = async function () {
+JobSchema.methods.slugify = async function (user) {
     this.slug = slugify(this.name) + '-' + (Math.random() * Math.pow(36, 10) | 0).toString(36);
 };
 
-JobSchema.methods.toJobResponse = async function () {
+JobSchema.methods.toJobResponse = async function (user) {
+    const authorObj = await Auth.findById(this.author);
     // const contractObj = await Contract.findById(this.id_contractcontract);
     // const workingDayObj = await WorkingDay.findById(this.id_working_day);
     // const provinceObj = await Province.findById(this.id_province);
@@ -77,6 +83,7 @@ JobSchema.methods.toJobResponse = async function () {
         slug: this.slug,
         name: this.name,
         author: this.author,
+        author:  authorObj.toProfileJSON(user),
         description: this.description,
         id_contract: this.id_contract,
         id_workingDay: this.id_workingDay,
