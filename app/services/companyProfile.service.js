@@ -23,7 +23,22 @@ const getProfile = async (req) => {
 };
 
 
+const followUser = async (req) => {
+    const { username } = req.params;
+    const loginUser = await companyProfileRepo.getProfile({ email: req.userEmail });
+    const user = await companyProfileRepo.getProfile({ username });
+
+    if (!user || !loginUser) {
+        return resp(404, { message: "User Not Found" });
+    }
+    await companyProfileRepo.followUser(loginUser, user._id);
+
+    return resp(200, { profile: user.toProfileJSON(loginUser) });
+}
+
+
 
 module.exports = {
-    getProfile
+    getProfile,
+    followUser
 }

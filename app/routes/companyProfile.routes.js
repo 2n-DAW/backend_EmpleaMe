@@ -6,7 +6,7 @@ module.exports = (app) => {
 
     app.get('/:username', verifyJWTOptional, getProfile);
 
-    //app.post('/:username/follow', verifyJWT, followUser);
+    app.post('/:username/follow', verifyJWT, followUser);
 
     //app.delete('/:username/follow', verifyJWT, unFollowUser);
 

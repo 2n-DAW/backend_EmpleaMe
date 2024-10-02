@@ -8,8 +8,8 @@ const getProfile = asyncHandler(async (req, res) => {
     return res.status(status).json(result);
 });
 
-const registerUser = asyncHandler(async (req, res) => {
-    const { status, result } = await authService.registerUser(req.body);
+const followUser = asyncHandler(async (req, res) => {
+    const { status, result } = await authService.followUser(req);
     return res.status(status).json(result);
 });
 
@@ -21,6 +21,6 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 
 module.exports = {
     getProfile,
-    registerUser,
+    followUser,
     getCurrentUser
 }
