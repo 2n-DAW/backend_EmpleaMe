@@ -1,8 +1,20 @@
-const resp = (status, result) => {
+const respMsg = (status, result) => {
     return {
         status: status,
         result: { message: result }
     };
+
 }
 
-exports.resp = resp;
+const resp = (status, result) => {
+    return {
+        status: status,
+        result: result
+    };
+
+}
+
+module.exports = {
+    resp,
+    respMsg
+}

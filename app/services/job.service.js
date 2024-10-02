@@ -1,9 +1,8 @@
 // SERVICES: toda la lógica de negocio
 const jobRepo = require('../repositories/job.repo.js');
 const categoryRepo = require('../repositories/category.repo.js');
-const contractRepo = require('../repositories/contract.repo.js');
-const workingDayRepo = require('../repositories/workingDay.repo.js');
-const provinceRepo = require('../repositories/province.repo.js');
+const { resp } = require('../utils/utils.js');
+
 
 // CREATE
 const createJob = async (data) => {
@@ -20,114 +19,72 @@ const createJob = async (data) => {
         id_province: data.id_province || null
     };
 
-    // comprueba si existe el id de categoria en su respectiva colección
     const id_cat = data.id_cat;
+
     const category = await categoryRepo.findOneCategory({ id_cat });
-    if (!category) {
-        return { message: "Categoria no encontrada" };
-    }
-
-    // comprueba si existe el id de contrato en su respectiva colección
-    // const id_contract = data.contract;
-    // const contract = await contractRepo.findContractId(id_contract);
-    // if (!contract) {
-    //     return { message: "Contrato no encontrado" };
-    // }
-
-    // comprueba si existe el id de workingDay en su respectiva colección
-    // const id_workingDay = data.working_day;
-    // const workingDay = await workingDayRepo.findWorkingDayId(id_workingDay);
-    // if (!workingDay) {
-    //     return { message: "Jornada no encontrada" };
-    // }
-
-    // comprueba si existe el id de province en su respectiva colección
-    // const id_province = data.province;
-    // const province = await provinceRepo.findProvinceId(id_province);
-    // if (!province) {
-    //     return { message: "Provincia no encontrada" };
-    // }
+    if (!category) return resp(404, { message: "Categoria no encontrada" });
 
     const newJob = await jobRepo.createJob(job_data);
+    if (!newJob) return resp(400, { message: "No se pudo crear el trabajo" });
 
-    if (!newJob) { //si no se crea el trabajo
-        return { message: "No se ha creado el trabajo" };
-    }
-
-    await category.addJob(newJob._id); //añadir trabajo a la categoría
-    return await newJob.toJobResponse();
+    await category.addJob(newJob._id);
+    return resp(201, await newJob.toJobResponse());
 };
 
-// FIND ONE
+
 const findOneJob = async (params) => {
     const job = await jobRepo.findOneJob(params);
-
-    if (!job) {
-        return { message: "Trabajo no encontrado" };
-    }
-
-    return await job.toJobResponse();
+    if (!job) return resp(404, { message: "Trabajo no encontrado" });
+    return resp(200, { job: await job.toJobResponse() });
 };
 
-// FIND ALL
+
 const findAllJobs = async (params) => {
     const { jobs, job_count } = await jobRepo.findAllJobs(params);
-
-    if (!jobs) {
-        return { message: "No se encontraron trabajos" };
-    }
-
-    return {
+    if (!jobs) return resp(404, { message: "No se encontraron trabajos" });
+    const res = {
         jobs: await Promise.all(jobs.map(async job => {
             return await job.toJobResponse();
         })),
         job_count
     };
+    return resp(200, res);
 };
 
-// GET JOBS BY CATEGORY
+
 const getJobsByCategory = async (params) => {
     const category = await categoryRepo.findOneCategory(params);
-
-    if (!category) {
-        return { message: "Categoria no encontrada" };
-    }
-
-    return await Promise.all(category.jobs.map(async jobId => {
+    if (!category) return resp(404, { message: "Categoria no encontrada" });
+    const res = await Promise.all(category.jobs.map(async jobId => {
         const jobObj = await jobRepo.getJobsByCategory(jobId);
         return await jobObj.toJobResponse();
     }))
+    return resp(200, { jobs: res });
 };
 
-// UPDATE
+
 const updateJob = async (params, data) => {
     const updatedJob = await jobRepo.updateJob(params, data);
-
-    if (!updatedJob) {
-        return { message: "Trabajo no encontrado" };
-    }
-
-    return await updatedJob.toJobResponse();
+    if (!updatedJob) return resp(400, { message: "No se pudo actualizar el trabajo" });
+    return resp(200, await updatedJob.toJobResponse());
 };
 
-// DELETE
+
 const deleteOneJob = async (params) => {
     const job = await jobRepo.findOneJob(params);
 
-    if (!job) {
-        return { message: "Trabajo no encontrado" };
-    }
+    if (!job) return resp(404, { message: "Trabajo no encontrado" });
 
     const id_cat = job.id_cat;
     const category = await categoryRepo.findOneCategory({ id_cat });
 
     if (category) {
-        await category.removeJob(job._id) // metodo en category.model.js, elimina trabajo del array de categoria
+        await category.removeJob(job._id)
     }
-
     await jobRepo.deleteOneJob(params);
-    return { message: "Trabajo eliminado" };
+    return resp(200, { message: "Trabajo eliminado" });
 };
+
 
 module.exports = {
     createJob,
