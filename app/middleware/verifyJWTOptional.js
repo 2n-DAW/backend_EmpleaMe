@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 const verifyJWTOptional = (req, res, next) => {
     const authHeader = req.headers.authorization || req.headers.Authorization
 
+    console.log(authHeader)
+
     if (!authHeader || !authHeader?.startsWith('Token ') || !authHeader.split(' ')[1].length) {
         req.loggedin = false;
         return next();

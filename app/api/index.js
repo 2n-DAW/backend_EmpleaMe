@@ -51,6 +51,7 @@ mongoose.connect(dbConfig.url, {
 );
 
 require('../routes/auth.routes')(app);
+require('../routes/companyProfile.routes')(app);
 
 app.listen(PORT, () => {
     console.log(`Servidor Express en el puerto ${PORT}`);

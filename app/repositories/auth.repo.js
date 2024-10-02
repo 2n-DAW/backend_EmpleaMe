@@ -11,7 +11,6 @@ const registerUser = async (params) => {
 };
 
 const getCurrentUser = async (email) => {
-
     return await User.findOne({ email });
 };
 
