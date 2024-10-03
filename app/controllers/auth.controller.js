@@ -20,7 +20,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
 // GET CURRENT USER
 const getCurrentUser = asyncHandler(async (req, res) => {
-    const currentUser = await authService.getCurrentUser(req);
+    const user = await authService.getCurrentUser(req);
 
     return res.status(200).json({ currentUser: user });
 });

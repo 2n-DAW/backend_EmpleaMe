@@ -13,7 +13,6 @@ const createJob = asyncHandler(async (req, res) => {
 
 // FEED ALL JOBS
 const feedAllJobs = asyncHandler(async (req, res) => {
-    console.log(req.query);
     const { jobs, job_count } = await jobService.feedAllJobs(req, req.query);
 
     return res.status(200).json({ jobs, job_count });
@@ -21,13 +20,12 @@ const feedAllJobs = asyncHandler(async (req, res) => {
 
 // LIST ALL JOBS
 const listAllJobs = asyncHandler(async (req, res) => {
-    console.log(req.query);
     const { jobs, job_count } = await jobService.listAllJobs(req, req.query);
 
     return res.status(200).json({ jobs, job_count });
 });
 
-// FIND ONE
+// FIND ONE JOB
 const findOneJob = asyncHandler(async (req, res) => {
     const job = await jobService.findOneJob(req.params);
 

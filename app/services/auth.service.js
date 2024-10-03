@@ -1,5 +1,6 @@
 // SERVICES: toda la lógica de negocio
 const authRepo = require('../repositories/auth.repo.js');
+const bcrypt = require('bcrypt');
 
 // LOGIN
 const userLogin = async (data) => {
@@ -54,6 +55,7 @@ const registerUser = async (data) => {
 const getCurrentUser = async (req) => {
     // After authentication; email and hashsed password was stored in req
     const email = req.userEmail;
+    // return email;
 
     const user = await authRepo.getCurrentUser({ email });
 

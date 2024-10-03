@@ -1,5 +1,6 @@
 // REPOSITORIES: operaciones con la base de datos
 const authModel = require('../models/auth.model.js');
+const bcrypt = require('bcrypt');
 
 // LOGIN
 const userLogin = async (emailObject) => {
@@ -7,8 +8,8 @@ const userLogin = async (emailObject) => {
 };
 
 // REGISTER
-const registerUser = async (userObject) => {
-    return await authModel.create(userObject);
+const registerUser = async (user) => {
+    return await authModel.create(user);
 };
 
 // GET CURRENT USER
@@ -18,8 +19,8 @@ const getCurrentUser = async (emailObject) => {
 
 // UPDATE
 const updateUser = async (emailObject, user) => {
-    const updatedUser = await authRepo.findOne(emailObject);
-
+    const updatedUser = await authModel.findOne(emailObject);
+    
     if (updatedUser) {
         if (user.email) {
             updatedUser.email = user.email;
@@ -37,15 +38,21 @@ const updateUser = async (emailObject, user) => {
         if (typeof user.bio !== 'undefined') {
             updatedUser.bio = user.bio;
         }
-        await updatedUser.save();
+        return await updatedUser.save();
     }
 
     return null;
+};
+
+// FIND BY ID
+const findById = async (id) => {
+    return await authModel.findById(id);
 };
 
 module.exports = {
     userLogin,
     registerUser,
     getCurrentUser,
-    updateUser
+    updateUser,
+    findById
 }

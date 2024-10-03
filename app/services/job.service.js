@@ -8,20 +8,11 @@ const authRepo = require('../repositories/auth.repo.js');
 
 // CREATE
 const createJob = async (req, data) => {
-    const job_data = {
-        name: data.name || null,
-        description: data.description || null,
-        salary: data.salary || null,
-        images: data.images,
-        img: data.img || null,
-        id_cat: data.id_cat || null,
-        id_contract: data.id_contract || null,
-        id_workingDay: data.id_workingDay || null,
-        id_province: data.id_province || null
-    };
-
     const id = req.userId;
     const author = await authRepo.findById(id);
+    if (!author) {
+        return { message: "Usuario no logeado" };
+    }
 
     // comprueba si existe el id de categoria en su respectiva colección
     const id_cat = data.id_cat;
@@ -51,8 +42,20 @@ const createJob = async (req, data) => {
     //     return { message: "Provincia no encontrada" };
     // }
 
+    const job_data = {
+        name: data.name || null,
+        description: data.description || null,
+        salary: data.salary || null,
+        images: data.images,
+        img: data.img || null,
+        id_cat: data.id_cat || null,
+        id_contract: data.id_contract || null,
+        id_workingDay: data.id_workingDay || null,
+        id_province: data.id_province || null,
+        author: id
+    };
+
     const newJob = await jobRepo.createJob(job_data);
-    newJob.author = id;
 
     if (!newJob) { //si no se crea el trabajo
         return { message: "No se ha creado el trabajo" };
