@@ -6,14 +6,14 @@ module.exports = (app) => {
     const { userLogin, registerUser, getCurrentUser, updateUser } = require('../controllers/auth.controller.js');
 
     // Authentication
-    app.post('/auth/login', userLogin);
+    app.post('/users/login', userLogin);
 
     // Registration
-    app.post('/auth', registerUser);
+    app.post('/users', registerUser);
 
     // Get Current User
-    app.get('/auth', verifyJWT, getCurrentUser);
+    app.get('/user', verifyJWT, getCurrentUser);
 
     // Update User
-    app.put('/auth', verifyJWT, updateUser);
+    app.put('/user', verifyJWT, updateUser);
 }

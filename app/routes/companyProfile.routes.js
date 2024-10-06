@@ -7,11 +7,11 @@ module.exports = (app) => {
     const { getProfile, followUser, unFollowUser, getProfile_User } = require('../controllers/companyProfile.controller.js');
 
     // Get profile - authentication optional
-    app.get('/:username', verifyJWTOptional, getProfile);
+    app.get('/profiles/:username', verifyJWTOptional, getProfile);
 
     // Follow a user
-    app.post('/:username/follow', verifyJWT, followUser);
+    app.post('/profiles/:username/follow', verifyJWT, followUser);
 
     // unfollow a user
-    app.delete('/:username/unfollow', verifyJWT, unFollowUser);
+    app.delete('/profiles/:username/unfollow', verifyJWT, unFollowUser);
 }

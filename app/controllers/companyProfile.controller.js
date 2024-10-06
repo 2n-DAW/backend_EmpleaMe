@@ -8,7 +8,7 @@ const asyncHandler = require('express-async-handler');
 const getProfile = asyncHandler(async (req, res) => {
     const user = await companyProfileService.getProfile(req, req.params);
 
-    return res.status(200).json(user)
+    return res.status(200).json({profile: user})
 });
 
 // FOLLOW A USER
