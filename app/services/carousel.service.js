@@ -13,7 +13,6 @@ const getCarouselCategory = async () => {
     const res = await Promise.all(categories.map(async category => {
         return await category.toCategoryCarouselResponse();
     }));
-    console.log(res);
     return resp(200, { categories: res });
 };
 

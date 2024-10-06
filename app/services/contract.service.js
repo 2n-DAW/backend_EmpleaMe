@@ -14,7 +14,7 @@ const createContract = async (data) => {
 
 const findAllContracts = async () => {
     const contracts = await contractRepo.findAllContracts();
-    if (!contracts) return { message: "No se encontraron contratos" };
+    if (!contracts) return resp(404, { message: "Contratos no encontrados" });
     const res = await Promise.all(contracts.map(async contract => {
         return await contract.toContractResponse();
     }));
@@ -24,7 +24,7 @@ const findAllContracts = async () => {
 
 const deleteOneContract = async (params) => {
     const contract = await contractRepo.deleteOneContract(params);
-    if (!contract) return { message: "Contrato no encontrada" };
+    if (!contract) return resp(404, { message: "Contrato no encontrado" });
     return resp(200, { message: "Contrato eliminado" });
 };
 

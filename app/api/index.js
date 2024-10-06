@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 3000;
 const CORSURL = process.env.CORSURL || "http://localhost:4200";
 
 
-console.log(`CORSURL: ${CORSURL}`);
+
 
 // Habilita CORS para todas las rutas
 const corsOptions = {

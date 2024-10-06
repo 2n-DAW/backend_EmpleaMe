@@ -55,7 +55,7 @@ userSchema.methods.generateAccessToken = function () {
         }
     },
         process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: "1d" }
+        { expiresIn: "1h" }
     );
     return accessToken;
 }
@@ -71,6 +71,8 @@ userSchema.methods.toUserResponse = function () {
 };
 
 userSchema.methods.toProfileJSON = function (user) {
+    console.log('User', user);
+    console.log('Following', user.isFollowing(this._id));
     return {
         username: this.username,
         bio: this.bio,

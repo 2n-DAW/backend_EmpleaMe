@@ -7,6 +7,7 @@ const { resp } = require("../utils/utils.js");
 const getProfile = async (req) => {
     const { username } = req.params;
     const loggedin = req.loggedin;
+    console.log('Loggedin', loggedin);
 
     const user = await companyProfileRepo.getProfile({ username });
 

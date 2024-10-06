@@ -46,36 +46,18 @@ const registerUser = async (params) => {
 }
 
 
-
-
-
 const getCurrentUser = async (email) => {
-
     const user = await authRepo.getCurrentUser(email);
-
-    if (!user) {
-        return { status: 404, result: { message: "User Not Found" } };
-    }
-
+    if (!user) return { status: 404, result: { message: "User Not Found" } };
     return resp(200, { user: user.toUserResponse() });
 };
 
 
-
-
-
-
 const updateUser = async (req) => {
-
     const { user } = req.body;
-    console.log(user);
-    if (!user) {
-        return resp(400, { message: "Required a User object" });
-    }
-
+    if (!user) return resp(400, { message: "Required a User object" });
     const email = req.userEmail;
     const target = await authRepo.findOneUser({ email });
-
 
     if (user.email) {
         target.email = user.email;
@@ -95,7 +77,6 @@ const updateUser = async (req) => {
     }
 
     await authRepo.updateUser(target);
-
     return resp(200, { user: target.toUserResponse() });
 
 };

@@ -14,7 +14,7 @@ const createProvince = async (data) => {
 
 const findAllProvinces = async (query) => {
     const provinces = await provinceRepo.findAllProvinces(query);
-    if (!provinces) return { message: "No se encontraron provincias" };
+    if (!provinces) return resp(404, { message: "Provincias no encontradas" });
     const res = await Promise.all(provinces.map(async province => {
         return await province.toProvinceResponse();
     }));
