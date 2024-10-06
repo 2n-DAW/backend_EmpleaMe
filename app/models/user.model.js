@@ -36,7 +36,12 @@ const userSchema = new mongoose.Schema({
     followingUsers: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
-    }]
+    }],
+    refreshToken: {
+        type: String,
+        default: ""
+    }
+
 },
     {
         timestamps: true
@@ -44,9 +49,23 @@ const userSchema = new mongoose.Schema({
 
 userSchema.plugin(uniqueValidator);
 
+// userSchema.pre('save', async function (next) {
+//     if (!this.isModified('password')) return next();
+//     try {
+//         const salt = await bcrypt.genSalt(10);
+//         this.password = await bcrypt.hash(this.password, salt);
+//         next();
+//     } catch (err) {
+//         next(err);
+//     }
+// });
+
+
+
+
 // @desc generate access token for a user
 // @required valid email and password
-userSchema.methods.generateAccessToken = function () {
+userSchema.methods.generateToken = function (time) {
     const accessToken = jwt.sign({
         "user": {
             "id": this._id,
@@ -55,10 +74,21 @@ userSchema.methods.generateAccessToken = function () {
         }
     },
         process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: "1h" }
+        { expiresIn: time }
     );
     return accessToken;
 }
+userSchema.methods.toLoginResponse = function () {
+    return {
+        username: this.username,
+        email: this.email,
+        bio: this.bio,
+        image: this.image,
+        accessToken: this.generateToken("15m"),
+        refreshToken: this.generateToken("7d")
+    }
+};
+
 
 userSchema.methods.toUserResponse = function () {
     return {
@@ -66,7 +96,7 @@ userSchema.methods.toUserResponse = function () {
         email: this.email,
         bio: this.bio,
         image: this.image,
-        token: this.generateAccessToken()
+        token: this.generateToken("15m"),
     }
 };
 

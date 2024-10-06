@@ -1,5 +1,5 @@
 module.exports = (app) => {
-    const { userLogin, registerUser, getCurrentUser, updateUser } = require('../controllers/auth.controller.js');
+    const { userLogin, registerUser, getCurrentUser, updateUser, logout } = require('../controllers/auth.controller.js');
     const verifyJWT = require('../middleware/verifyJWT.js');
 
 
@@ -10,5 +10,7 @@ module.exports = (app) => {
     app.get('/user', verifyJWT, getCurrentUser);
 
     app.put('/user', verifyJWT, updateUser);
+
+    app.post('/logout', logout);
 
 }

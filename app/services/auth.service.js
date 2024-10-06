@@ -17,7 +17,17 @@ const userLogin = async (params) => {
         return resp(401, { message: "Invalid Password" });
     }
 
-    return resp(200, { user: loginUser.toUserResponse() });
+    const res = loginUser.toLoginResponse();
+    const refreshToken = res.refreshToken;
+
+    const target = await authRepo.findOneUser({ email: user.email });
+
+    target.refreshToken = refreshToken;
+
+    await authRepo.updateUser(target);
+
+
+    return resp(200, { user: res });
 };
 
 
@@ -78,12 +88,13 @@ const updateUser = async (req) => {
 
     await authRepo.updateUser(target);
     return resp(200, { user: target.toUserResponse() });
-
 };
+
 
 module.exports = {
     userLogin,
     registerUser,
     getCurrentUser,
-    updateUser
+    updateUser,
+
 }
