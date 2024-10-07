@@ -84,8 +84,8 @@ userSchema.methods.toLoginResponse = function () {
         email: this.email,
         bio: this.bio,
         image: this.image,
-        accessToken: this.generateToken("15m"),
-        refreshToken: this.generateToken("7d")
+        accessToken: this.generateToken("1m"),
+        refreshToken: this.generateToken("2m")
     }
 };
 
@@ -96,7 +96,7 @@ userSchema.methods.toUserResponse = function () {
         email: this.email,
         bio: this.bio,
         image: this.image,
-        token: this.generateToken("15m"),
+        accessToken: this.generateToken("1m"),
     }
 };
 

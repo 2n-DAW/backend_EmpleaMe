@@ -27,12 +27,18 @@ const logout = asyncHandler(async (req, res) => {
     return res.status(status).json(result);
 });
 
+const refresh = asyncHandler(async (req, res) => {
+    const { status, result } = await authService.refresh(req);
+    return res.status(status).json(result);
+});
+
 
 module.exports = {
     userLogin,
     registerUser,
     getCurrentUser,
     updateUser,
-    logout
+    logout,
+    refresh
 
 }

@@ -1,9 +1,9 @@
 const jwt = require('jsonwebtoken');
 
-const verifyJWT = (req, res, next) => {
-    const authHeader = req.headers.authorization || req.headers.Authorization;
+const verifyJWTRefresh = (req, res, next) => {
+    const authHeader = req.headers.refresh || req.headers.Refresh;
 
-    console.log('NoOptional', authHeader);
+    console.log('refresh', authHeader);
 
     if (!authHeader?.startsWith('Token ')) {
         return res.status(401).json({ message: 'Unauthorized' })
@@ -26,4 +26,4 @@ const verifyJWT = (req, res, next) => {
     )
 };
 
-module.exports = verifyJWT;
+module.exports = verifyJWTRefresh;

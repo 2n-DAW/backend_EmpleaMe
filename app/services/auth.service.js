@@ -90,11 +90,22 @@ const updateUser = async (req) => {
     return resp(200, { user: target.toUserResponse() });
 };
 
+const refresh = async (req) => {
+    const { userEmail } = req;
+    const target = await authRepo.findOneUser({ email: userEmail });
+
+    const accessToken = target.toUserResponse();
+
+    console.log('Access Token', accessToken);
+
+    return resp(200, { user: accessToken });
+}
+
 
 module.exports = {
     userLogin,
     registerUser,
     getCurrentUser,
     updateUser,
-
+    refresh
 }
