@@ -29,8 +29,6 @@ const findAllJobs = async (params) => {
     salary_min = isNotUndefined(salary_min) ? salary_min : 0;
     salary_max = isNotUndefined(salary_max) ? salary_max : 999999;
 
-    console.log(params);
-
     query = {
         name: { $regex: name_regex },
         $and: [{ salary: { $gte: salary_min } }, { salary: { $lte: salary_max } }]

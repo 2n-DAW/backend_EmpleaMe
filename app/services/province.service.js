@@ -1,40 +1,33 @@
-// SERVICES: toda la lógica de negocio
 const provinceRepo = require("../repositories/province.repo.js");
+const { resp } = require("../utils/utils.js");
 
-//CREATE
+
 const createProvince = async (data) => {
-    //montamos el objeto con los datos que vienen en el body
     const province_data = {
         id_province: data.id_province || null,
         province_name: data.province_name || null,
     };
-
-    return await provinceRepo.createProvince(province_data);
+    const res = await provinceRepo.createProvince(province_data);
+    return resp(201, await res.toProvinceResponse());
 };
 
-// FIND ALL
+
 const findAllProvinces = async (query) => {
     const provinces = await provinceRepo.findAllProvinces(query);
-
-    if (!provinces) {
-        return { message: "No se encontraron provincias" };
-    }
-
-    return await Promise.all(provinces.map(async province => {
-            return await province.toProvinceResponse();
-        }));
+    if (!provinces) return resp(404, { message: "Provincias no encontradas" });
+    const res = await Promise.all(provinces.map(async province => {
+        return await province.toProvinceResponse();
+    }));
+    return resp(200, { provinces: res });
 };
 
-// DELETE ONE
+
 const deleteOneProvince = async (params) => {
     const province = await provinceRepo.deleteOneProvince(params);
-
-    if (!province) {
-        return { message: "Provincia no encontrada" };
-    }
-
-    return { message: "Provincia eliminada" };
+    if (!province) return resp(404, { message: "Provincia no encontrada" });
+    return resp(200, { message: "Provincia eliminada" });
 };
+
 
 module.exports = {
     createProvince,

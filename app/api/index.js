@@ -6,12 +6,13 @@ const dotenv = require("dotenv");
 const app = express();
 dotenv.config();
 
+console.log(process.env.ACCESS_TOKEN_SECRET);
 
 const PORT = process.env.PORT || 3000;
 const CORSURL = process.env.CORSURL || "http://localhost:4200";
 
 
-console.log(`CORSURL: ${CORSURL}`);
+
 
 // Habilita CORS para todas las rutas
 const corsOptions = {
@@ -45,10 +46,12 @@ mongoose.connect(dbConfig.url, {
 });
 
 // require('../routes/category.routes')(app);
-['category', 'job', 'carousel', 'contract', 'workingDay', 'province'].forEach(
+['category', 'job', 'carousel', 'contract', 'workingDay', 'province', 'auth'].forEach(
     route => require(`../routes/${route}.routes`)(app)
 );
 
+require('../routes/auth.routes')(app);
+require('../routes/companyProfile.routes')(app);
 
 app.listen(PORT, () => {
     console.log(`Servidor Express en el puerto ${PORT}`);

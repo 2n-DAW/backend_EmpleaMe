@@ -60,8 +60,6 @@ JobSchema.pre('validate', async function (next) {
     if (!this.slug) {
         await this.slugify();
     }
-
-    console.log(this.slug);
     next();
 });
 
