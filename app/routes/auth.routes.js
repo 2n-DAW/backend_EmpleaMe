@@ -3,7 +3,7 @@
 const verifyJWT = require('../middleware/verifyJWT.js');
 
 module.exports = (app) => {
-    const { userLogin, registerUser, getCurrentUser, updateUser } = require('../controllers/auth.controller.js');
+    const { userLogin, registerUser, getCurrentUser, updateUser, logout } = require('../controllers/auth.controller.js');
 
     // Authentication
     app.post('/users/login', userLogin);
@@ -16,4 +16,7 @@ module.exports = (app) => {
 
     // Update User
     app.put('/user', verifyJWT, updateUser);
+
+    // Logout
+    app.get('/user/logout', logout);
 }

@@ -29,12 +29,29 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 const updateUser = asyncHandler(async (req, res) => {
     const updatedUser = await authService.updateUser(req, req.body);
 
-    res.status(200).json(updatedUser);
+    return res.status(200).json(updatedUser);
 })
+
+// LOGOUT
+const logout = asyncHandler(async (req, res) => {
+    const authHeader = req.headers.authorization || req.headers.Authorization
+    
+    if (!authHeader?.startsWith('Token ')) {
+        return res.status(401).json({ message: 'Unauthorized' })
+    }
+
+    const accessToken  = authHeader.split(' ')[1];
+
+    const logoutUser = await authService.logout(accessToken);
+
+    return res.status(200).json(logoutUser);
+});
+
 
 module.exports = {
     userLogin,
     registerUser,
     getCurrentUser,
-    updateUser
+    updateUser,
+    logout
 }

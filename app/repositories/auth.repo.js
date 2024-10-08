@@ -1,5 +1,7 @@
 // REPOSITORIES: operaciones con la base de datos
 const authModel = require('../models/auth.model.js');
+const tokenModel = require('../models/token.model.js');
+const blacklistModel = require('../models/blacklist.model.js');
 const bcrypt = require('bcrypt');
 
 // LOGIN
@@ -49,10 +51,60 @@ const findById = async (id) => {
     return await authModel.findById(id);
 };
 
+// SAVE TOKEN
+const saveToken = async (refresh, access, userId) => {
+    const storedToken = await tokenModel.findOne({ refreshToken: refresh });
+    
+    if (!storedToken) {
+        newToken = new tokenModel({
+            refreshToken: refresh,
+            accessTokens: [{
+                token: access,
+                createdAt: new Date()
+            }],
+            user: userId
+        });
+
+        return await newToken.save();
+    } 
+
+    storedToken.accessTokens.push({
+        token: access,
+        createdAt: new Date()
+    });
+
+    return await storedToken.save();
+};
+
+// FIND ONE TOKEN
+const findOneToken = async (access) => {
+    return await tokenModel.findOne({ 'accessTokens.token': access }, { refreshToken: 1 });
+};
+
+// FIND IN BLACKLIST
+const isBlacklisted = async (refresh) => {
+    return await blacklistModel.findOne({ refreshToken: refresh });
+};
+
+// CREATE BLACKLIST TOKEN
+const createBlacklistToken = async (refresh) => {
+    return await blacklistModel.create({ refreshToken: refresh });
+};
+
+// DELETE REFRESH
+const deleteOneRefresh = async (refresh) => {
+    return await tokenModel.deleteOne({ refreshToken: refresh });
+}
+
 module.exports = {
     userLogin,
     registerUser,
     getCurrentUser,
     updateUser,
-    findById
+    findById,
+    saveToken,
+    findOneToken,
+    isBlacklisted,
+    createBlacklistToken,
+    deleteOneRefresh
 }

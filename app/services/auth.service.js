@@ -21,7 +21,13 @@ const userLogin = async (data) => {
 
     if (!match) return { message: 'Contraseña no autorizada' };
 
-    return await loginUser.toAuthResponse();
+    const accessToken = await loginUser.generateAccessToken();
+    const refreshToken = await loginUser.generateRefreshToken();
+
+    // Guarda el refreshToken en la base de datos junto el idUser
+    await authRepo.saveToken(refreshToken, accessToken, loginUser._id);
+
+    return await loginUser.toAuthResponse(accessToken);
 };
 
 // REGISTER
@@ -55,7 +61,7 @@ const registerUser = async (data) => {
 const getCurrentUser = async (req) => {
     // After authentication; email and hashsed password was stored in req
     const email = req.userEmail;
-    // return email;
+    const accessToken = req.token;
 
     const user = await authRepo.getCurrentUser({ email });
 
@@ -63,7 +69,7 @@ const getCurrentUser = async (req) => {
         return { message: "Usuario no encontrado" };
     }
 
-    return await user.toAuthResponse();
+    return await user.toAuthResponse(accessToken);
 };
 
 // UPDATE
@@ -86,9 +92,23 @@ const updateUser = async (req, data) => {
     return await updatedUser.toAuthResponse();
 };
 
+// LOGOUT
+const logout = async (accessToken) => {
+    const refreshTokenFinded = await authRepo.findOneToken(accessToken);
+    const refreshToken =refreshTokenFinded.refreshToken;
+
+    if (!refreshToken) return { message: 'Tokens corruptos' };
+
+    await authRepo.createBlacklistToken(refreshToken);
+    await authRepo.deleteOneRefresh(refreshToken);
+
+    return { message: 'Deslogeado correctamente' };
+};
+
 module.exports = {
     userLogin,
     registerUser,
     getCurrentUser,
-    updateUser
+    updateUser,
+    logout
 }

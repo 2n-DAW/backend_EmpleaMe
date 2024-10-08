@@ -50,23 +50,39 @@ AuthSchema.methods.generateAccessToken = function() {
     const accessToken = jwt.sign({
             "user": {
                 "id": this._id,
+                "username": this.username,
                 "email": this.email,
                 "password": this.password
             }
         },
         process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: "1d"}
+        { expiresIn: process.env.ACCESS_TOKEN_EXPIRATION }
     );
     return accessToken;
 }
 
-AuthSchema.methods.toAuthResponse = function() {
+AuthSchema.methods.generateRefreshToken = function() {
+    const refreshToken = jwt.sign({
+            "user": {
+                "id": this._id,
+                "username": this.username,
+                "email": this.email,
+                "password": this.password
+            }
+        },
+        process.env.REFRESH_TOKEN_SECRET,
+        { expiresIn: process.env.REFRESH_TOKEN_EXPIRATION }
+    );
+    return refreshToken;
+}
+
+AuthSchema.methods.toAuthResponse = function(accessToken) {
     return {
         username: this.username,
         email: this.email,
         bio: this.bio,
         image: this.image,
-        token: this.generateAccessToken()
+        token: accessToken
     }
 };
 
