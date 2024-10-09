@@ -23,33 +23,33 @@ const verifyJWT = async (req, res, next) => {
          if (blacklisted) return res.status(403).json({ message: 'Refresh token en blacklist' });
          
          jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, decodedRefresh) => {
-               if (err) {
-                  // Si el refreshToken ha expirado, lo añade a la blacklist
-                  await authRepo.createBlacklistToken(refreshToken);
-                  // lo elimina de la lista de refresh activos
-                  await authRepo.deleteOneRefresh(refreshToken);
-                  return res.status(403).json({ message: 'Refresh token no válido' });
-               }
-               
-               // Generar un nuevo accessToken               
-               const newAccessToken = jwt.sign({
-                  "user": {
-                     "id": decodedRefresh.user.id,
-                     "username": decodedRefresh.user.username,
-                     "email": decodedRefresh.user.email,
-                     "password": decodedRefresh.user.password
-                     }
-                  },
-                  process.env.ACCESS_TOKEN_SECRET,
-                  { expiresIn: process.env.ACCESS_TOKEN_EXPIRATION }
-               );
+            if (err) {
+               // Si el refreshToken ha expirado, lo añade a la blacklist
+               await authRepo.createBlacklistToken(refreshToken);
+               // lo elimina de la lista de refresh activos
+               await authRepo.deleteOneRefresh(refreshToken);
+               return res.status(403).json({ message: 'Refresh token no válido' });
+            }
+            
+            // Genera un nuevo accessToken               
+            const newAccessToken = jwt.sign({
+               "user": {
+                  "id": decodedRefresh.user.id,
+                  "username": decodedRefresh.user.username,
+                  "email": decodedRefresh.user.email,
+                  "password": decodedRefresh.user.password
+                  }
+               },
+               process.env.ACCESS_TOKEN_SECRET,
+               { expiresIn: process.env.ACCESS_TOKEN_EXPIRATION }
+            );
 
-               // guarda el nuevo accessToken en BD junto su correspondiente refreshToken
-               await authRepo.saveToken(refreshToken, newAccessToken, decodedRefresh.user.id);
+            // Guarda el nuevo accessToken en BD junto su correspondiente refreshToken
+            await authRepo.saveToken(refreshToken, newAccessToken, decodedRefresh.user.id);
 
-               req.userEmail = decodedRefresh.user.email;
-               req.token = newAccessToken;
-               next();
+            req.userEmail = decodedRefresh.user.email;
+            req.token = newAccessToken;
+            next();
          });
       } else {
          req.userId = decodedAccess.user.id;

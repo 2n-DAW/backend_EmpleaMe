@@ -16,10 +16,6 @@ const JobSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    // author: {
-    //     type: String,
-    //     required: true
-    // },
     author: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Auth'
@@ -54,6 +50,14 @@ const JobSchema = mongoose.Schema({
         type: String,
         required: false
     },
+    favouritesCount: {
+        type: Number,
+        default: 0
+    },
+    // comments: [{
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'Comment'
+    // }]
 },
 {
     timestamps: true
@@ -70,9 +74,19 @@ JobSchema.pre('validate', async function (next) {
     next();
 });
 
-JobSchema.methods.slugify = async function (user) {
+JobSchema.methods.slugify = async function () {
     this.slug = slugify(this.name) + '-' + (Math.random() * Math.pow(36, 10) | 0).toString(36);
 };
+
+JobSchema.methods.updateFavoriteCount = async function () {
+    const favoriteCount = await Auth.count({
+        favouriteJobs: {$in: [this._id]}
+    });
+
+    this.favouritesCount = favoriteCount;
+
+    return this.save();
+}
 
 JobSchema.methods.toJobResponse = async function (user) {
     const authorObj = await Auth.findById(this.author);
@@ -82,7 +96,6 @@ JobSchema.methods.toJobResponse = async function (user) {
     return {
         slug: this.slug,
         name: this.name,
-        author: this.author,
         author:  authorObj.toProfileJSON(user),
         description: this.description,
         id_contract: this.id_contract,
@@ -93,32 +106,30 @@ JobSchema.methods.toJobResponse = async function (user) {
         img: this.img,
         id_cat: this.id_cat,
         createdAt: this.createdAt,
-        updatedAt: this.updatedAt
+        updatedAt: this.updatedAt,
+        favorited: user ? user.isFavourite(this._id) : false,
+        favoritesCount: this.favouritesCount
     }
 }
-
-// JobSchema.methods.toAllJobResponse = async function () {
-//     return {
-//         slug: this.slug,
-//         name: this.name,
-//         author: this.author,
-//         description: this.description,
-//         contract: this.contract,
-//         working_day: this.working_day,
-//         province: this.province,
-//         salary: this.salary,
-//         images: this.images,
-//         img: this.img,
-//         id_cat: this.id_cat,
-//         createdAt: this.createdAt,
-//         updatedAt: this.updatedAt
-//     }
-// }
 
 JobSchema.methods.toJobCarouselResponse = async function () {
     return {
         images: this.images
     }
 }
+
+// JobSchema.methods.addComment = function (commentId) {
+//     if(this.comments.indexOf(commentId) === -1){  // cuando metodo indexOf no encuentra el id del comentario, entrega valor -1
+//         this.comments.push(commentId);
+//     }
+//     return this.save();
+// };
+
+// JobSchema.methods.removeComment = function (commentId) {
+//     if(this.comments.indexOf(commentId) !== -1){
+//         this.comments.remove(commentId);
+//     }
+//     return this.save();
+// };
 
 module.exports = mongoose.model('Job', JobSchema);
