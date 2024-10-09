@@ -1,19 +1,20 @@
+const verifyJWT = require('../middleware/verifyJWT.js');
+
 module.exports = (app) => {
-    const { userLogin, registerUser, getCurrentUser, updateUser, logout, refresh } = require('../controllers/auth.controller.js');
-    const verifyJWT = require('../middleware/verifyJWT.js');
-    const verifyJWTRefresh = require('../middleware/verifyJWTRefresh.js');
+    const { userLogin, registerUser, getCurrentUser, updateUser, logout } = require('../controllers/auth.controller.js');
 
-
+    // Authentication
     app.post('/users/login', userLogin);
 
-    app.post('/users', registerUser);
+    // Registration
+    app.post('/users/register', registerUser);
 
+    // Get Current User
     app.get('/user', verifyJWT, getCurrentUser);
 
+    // Update User
     app.put('/user', verifyJWT, updateUser);
 
-    app.post('/user/logout', logout);
-
-    app.post('/user/refresh', verifyJWTRefresh, refresh);
-
+    // Logout
+    app.get('/user/logout', logout);
 }

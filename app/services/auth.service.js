@@ -1,111 +1,107 @@
-const authRepo = require("../repositories/auth.repo.js");
+// SERVICES: toda la lógica de negocio
+const authRepo = require('../repositories/auth.repo.js');
 const { resp } = require("../utils/utils.js");
+const bcrypt = require('bcrypt');
 
-const userLogin = async (params) => {
-    const { user } = params;
+// LOGIN
+const userLogin = async (data) => {
+    const { user } = data;
+
+    // confirm data
     if (!user || !user.email || !user.password) {
-        return resp(400, { message: "All fields are required" });
+        return resp(400, { message: "Todos los campos son necesarios" });
     }
 
     const loginUser = await authRepo.userLogin({ email: user.email });
-    if (!loginUser) {
-        return resp(404, { message: "User Not Found" });
-    }
 
-    const match = await authRepo.comparePassword(user.password, loginUser.password);
-    if (!match) {
-        return resp(401, { message: "Invalid Password" });
-    }
+    if (!loginUser) return resp(404, { message: "Usuario no encontrado" });
 
-    const res = loginUser.toLoginResponse();
-    const refreshToken = res.refreshToken;
+    const match = await bcrypt.compare(user.password, loginUser.password);
 
-    const target = await authRepo.findOneUser({ email: user.email });
+    if (!match) return resp(401, { message: "Contraseña inválida" });
 
-    target.refreshToken = refreshToken;
+    const accessToken = await loginUser.generateAccessToken();
+    const refreshToken = await loginUser.generateRefreshToken();
 
-    await authRepo.updateUser(target);
+    // Guarda el refreshToken en la base de datos junto el idUser
+    await authRepo.saveToken(refreshToken, accessToken, loginUser._id);
 
-
+    const res = loginUser.toAuthResponse(accessToken);
     return resp(200, { user: res });
 };
 
+// REGISTER
+const registerUser = async (data) => {
+    const { user } = data;
 
-const registerUser = async (params) => {
-    const { user } = params;
-
+    // confirm data
     if (!user || !user.email || !user.username || !user.password) {
-        return resp(400, { message: "All fields are required" });
+        return resp(400, { message: "Todos los campos son necesarios" });
     }
 
-    const hashedPassword = await authRepo.hashPassword(user.password, 10);
+    // hash password
+    const hashedPwd = await bcrypt.hash(user.password, 10);
 
     const userObject = {
         "username": user.username,
-        "password": hashedPassword,
+        "password": hashedPwd,
         "email": user.email
     };
 
     const newUser = await authRepo.registerUser(userObject);
 
     if (newUser) {
-        return resp(201, { user: newUser.toUserResponse() });
+        return resp(201, { user: newUser.toAuthResponse() });
     } else {
-        return resp(400, { message: "User Registration Failed" });
+        return resp(400, { message: "Registro de usuario fallido" });
     }
-}
-
-
-const getCurrentUser = async (email) => {
-    const user = await authRepo.getCurrentUser(email);
-    if (!user) return { status: 404, result: { message: "User Not Found" } };
-    return resp(200, { user: user.toUserResponse() });
 };
 
+// GET CURRENT USER
+const getCurrentUser = async (req) => {
+    const email = req.userEmail;
+    const accessToken = req.token;
 
+    const user = await authRepo.getCurrentUser({ email });
+
+    if (!user) return { status: 404, result: { message: "Usuario no encontrado" } };
+
+    return resp(200, { currentUser: user.toAuthResponse(accessToken) });
+};
+
+// UPDATE
 const updateUser = async (req) => {
     const { user } = req.body;
-    if (!user) return resp(400, { message: "Required a User object" });
+
+    // confirm data
+    if (!user) return resp(400, { message: "Usuario necesario" });
+
     const email = req.userEmail;
-    const target = await authRepo.findOneUser({ email });
 
-    if (user.email) {
-        target.email = user.email;
-    }
-    if (user.username) {
-        target.username = user.username;
-    }
-    if (user.password) {
-        const hashedPwd = await authRepo.hashPassword(user.password, 10);
-        target.password = hashedPwd;
-    }
-    if (typeof user.image !== 'undefined') {
-        target.image = user.image;
-    }
-    if (typeof user.bio !== 'undefined') {
-        target.bio = user.bio;
-    }
+    const updatedUser = await authRepo.updateUser({ email }, user);
 
-    await authRepo.updateUser(target);
-    return resp(200, { user: target.toUserResponse() });
+    if (!updatedUser) return resp(404, { message: "Usuario no encontrado" });
+
+    return resp(200, { user: updatedUser.toAuthResponse() });
 };
 
-const refresh = async (req) => {
-    const { userEmail } = req;
-    const target = await authRepo.findOneUser({ email: userEmail });
+// LOGOUT
+const logout = async (accessToken) => {
+    const refreshTokenFinded = await authRepo.findOneToken(accessToken);
+    const refreshToken =refreshTokenFinded.refreshToken;
 
-    const accessToken = target.toUserResponse();
+    if (!refreshToken) return { status: 404, result: { message: "Tokens no encontrados" } };
 
-    console.log('Access Token', accessToken);
+    await authRepo.createBlacklistToken(refreshToken);
+    await authRepo.deleteOneRefresh(refreshToken);
 
-    return resp(200, { user: accessToken });
-}
-
+    return resp(200, { message: 'Deslogeado correctamente' });
+};
 
 module.exports = {
     userLogin,
     registerUser,
     getCurrentUser,
     updateUser,
-    refresh
+    logout
 }

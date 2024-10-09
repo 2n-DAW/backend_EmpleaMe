@@ -1,13 +1,15 @@
+const verifyJWT = require('../middleware/verifyJWT.js');
+const verifyJWTOptional = require('../middleware/verifyJWTOptional.js');
+
 module.exports = (app) => {
     const { getProfile, followUser, unFollowUser } = require('../controllers/companyProfile.controller.js');
-    const verifyJWT = require('../middleware/verifyJWT.js');
-    const verifyJWTOptional = require('../middleware/verifyJWTOptional.js');
 
+    // Get profile - authentication optional
+    app.get('/profiles/:username', verifyJWTOptional, getProfile);
 
-    app.get('/:username', verifyJWTOptional, getProfile);
+    // Follow a user
+    app.post('/profiles/:username/follow', verifyJWT, followUser);
 
-    app.post('/:username/follow', verifyJWT, followUser);
-
-    app.delete('/:username/unfollow', verifyJWT, unFollowUser);
-
+    // unfollow a user
+    app.delete('/profiles/:username/unfollow', verifyJWT, unFollowUser);
 }
