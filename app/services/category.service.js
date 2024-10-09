@@ -1,5 +1,6 @@
 // SERVICES: toda la lógica de negocio
 const categoryRepo = require("../repositories/category.repo.js");
+const { resp } = require("../utils/utils.js");
 
 //CREATE
 const createCategory = async (data) => {
@@ -10,54 +11,47 @@ const createCategory = async (data) => {
         image: data.image || null,
         jobs: []
     };
-
-    return await categoryRepo.createCategory(category_data);
+    const res = await categoryRepo.createCategory(category_data);
+    return resp(201, res.toCategoryResponse());
 };
 
 // FIND ALL
 const findAllCategories = async (query) => {
     const categories = await categoryRepo.findAllCategories(query);
 
-    if (!categories) {
-        return { message: "No se encontraron categorías" };
-    }
+    if (!categories) return resp(404, { message: "No se encontraron categorías" });
 
-    return await Promise.all(categories.map(async category => {
-            return await category.toCategoryResponse();
-        }));
+    const res = await Promise.all(categories.map(async category => {
+        return await category.toCategoryResponse();
+    }));
+    return resp(200, { categories: res });
 };
 
 // FIND ONE
 const findOneCategory = async (params) => {
     const category = await categoryRepo.findOneCategory(params);
 
-    if (!category) {
-        return { message: "Categoría no encontrada" };
-    }
+    if (!category) return resp(404, { message: "Categoría no encontrada" });
 
-    return await category.toCategoryResponse();
+    return resp(200, { categories: category.toCategoryResponse() });
 };
 
 // UPDATE
 const updateCategory = async (params, data) => {
     const updatedCategory = await categoryRepo.updateCategory(params, data);
 
-    if (!updatedCategory) {
-        return { message: "Categoría no encontrada" };
-    }
+    if (!updatedCategory) return resp(404, { message: "Categoría no encontrada" });
 
-    return await updatedCategory.toCategoryResponse();
+    return resp(200, updatedCategory.toCategoryResponse());
 };
 
 // DELETE ONE
 const deleteOneCategory = async (params) => {
     const category = await categoryRepo.deleteOneCategory(params);
 
-    if (!category) {
-        return { message: "Categoría no encontrada" };
-    }
-
-    return { message: "Categoria eliminada" };
+    if (!category) return resp(404, { message: "Categoría no encontrada" });
+    
+    return resp(200, { message: "Categoría eliminada" });
 };
 
 module.exports = {

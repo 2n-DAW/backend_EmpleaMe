@@ -1,54 +1,54 @@
 // SERVICES: toda la lógica de negocio
 const companyProfileRepo = require('../repositories/companyProfile.repo.js');
+const { resp } = require("../utils/utils.js");
 
 // GET PROFILE
-const getProfile = async (req, params) => {
-    const { username } = params;
+const getProfile = async (req) => {
+    const { username } = req.params;
     const loggedin = req.loggedin;
 
-    // console.log(`print out username ${username}`)
-    const user = await companyProfileRepo.findOne({ username });
+    const user = await companyProfileRepo.getProfile({ username });
 
     if (!user) {
-        return { message: "Usuario no encontrado" };
+        return resp(404, { message: "Usuario no encontrado" });
     }
 
     if (!loggedin) {
-        return user.toProfileJSON(false);
+        return resp(200, { profile: user.toProfileJSON(false) });
     } else {
-        const loginUser = await companyProfileRepo.findOne({ email: req.userEmail });
-        return user.toProfileJSON(loginUser);
+        const loginUser = await companyProfileRepo.getProfile({ email: req.userEmail });
+        return resp(200, { profile: user.toProfileJSON(loginUser) });
     }
 };
 
 // FOLLOW A USER
-const followUser = async (req, params) => {
-    const { username } = params;
+const followUser = async (req) => {
+    const { username } = req.params;
 
-    const loginUser = await companyProfileRepo.findOne({ email: req.userEmail });
-    const user = await companyProfileRepo.findOne({ username });
+    const loginUser = await companyProfileRepo.getProfile({ email: req.userEmail });
+    const user = await companyProfileRepo.getProfile({ username });
 
     if (!user || !loginUser) {
-        return { message: "Usuario no encontrado" };
+        return resp(404, { message: "Usuario no encontrado" });
     }
-    await loginUser.follow(user._id);
+    await companyProfileRepo.followUser(loginUser, user._id);
 
-    return await user.toAuthResponse(loginUser);
+    return resp(200, { profile: user.toProfileJSON(loginUser) });
 };
 
 // UNFOLLOW A USER
-const unFollowUser = async (req, params) => {
-    const { username } = params;
+const unFollowUser = async (req) => {
+    const { username } = req.params;
 
-    const loginUser = await companyProfileRepo.findOne({ email: req.userEmail });
-    const user = await companyProfileRepo.findOne({ username });
+    const loginUser = await companyProfileRepo.getProfile({ email: req.userEmail });
+    const user = await companyProfileRepo.getProfile({ username });
 
     if (!user || !loginUser) {
-        return { message: "Usuario no encontrado" };
+        return resp(404, { message: "Usuario no encontrado" });
     }
-    await loginUser.unfollow(user._id);
+    await companyProfileRepo.unFollowUser(loginUser, user._id);
 
-    return await user.toAuthResponse(loginUser);
+    return resp(200, { profile: user.toProfileJSON(loginUser) });
 };
 
 module.exports = {

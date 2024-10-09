@@ -1,5 +1,6 @@
 // SERVICES: toda la lógica de negocio
 const contractRepo = require("../repositories/contract.repo.js");
+const { resp } = require("../utils/utils.js");
 
 //CREATE
 const createContract = async (data) => {
@@ -9,31 +10,29 @@ const createContract = async (data) => {
         contract_name: data.contract_name || null,
     };
 
-    return await contractRepo.createContract(contract_data);
+    const res = await contractRepo.createContract(contract_data);
+    return resp(201, res.toContractResponse());
 };
 
 // FIND ALL
 const findAllContracts = async () => {
     const contracts = await contractRepo.findAllContracts();
 
-    if (!contracts) {
-        return { message: "No se encontraron contratos" };
-    }
+    if (!contracts) return resp(404, { message: "No se encontraron contratos" });
 
-    return await Promise.all(contracts.map(async contract => {
-            return await contract.toContractResponse();
-        }));
+    const res = await Promise.all(contracts.map(async contract => {
+        return await contract.toContractResponse();
+    }));
+    return resp(200, { contracts: res });
 };
 
 // DELETE ONE
 const deleteOneContract = async (params) => {
     const contract = await contractRepo.deleteOneContract(params);
 
-    if (!contract) {
-        return { message: "Contrato no encontrada" };
-    }
+    if (!contract) return resp(404, { message: "Contrato no encontrado" });
 
-    return { message: "Contrato eliminada" };
+    return resp(200, { message: "Contrato eliminado" });
 };
 
 module.exports = {

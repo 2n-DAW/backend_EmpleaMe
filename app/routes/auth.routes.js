@@ -1,5 +1,3 @@
-// const express = require('express');
-// const router = express.Router();
 const verifyJWT = require('../middleware/verifyJWT.js');
 
 module.exports = (app) => {
@@ -9,7 +7,7 @@ module.exports = (app) => {
     app.post('/users/login', userLogin);
 
     // Registration
-    app.post('/users', registerUser);
+    app.post('/users/register', registerUser);
 
     // Get Current User
     app.get('/user', verifyJWT, getCurrentUser);

@@ -14,22 +14,22 @@ const findOneJob = async (params) => {
     return await jobModel.findOne(params);
 };
 
-// FEED ALL JOBS
-const feedAllJobs = async (params, loginUser) => {
-    let { limit, offset } = params;
+// // FEED ALL JOBS
+// const feedAllJobs = async (params, loginUser) => {
+//     let { limit, offset } = params;
 
-    limit = isNotUndefined(limit) ? parseInt(limit) : 3;
-    offset = isNotUndefined(offset) ? parseInt(offset) : 0;
+//     limit = isNotUndefined(limit) ? parseInt(limit) : 3;
+//     offset = isNotUndefined(offset) ? parseInt(offset) : 0;
 
-    console.log(params);
+//     console.log(params);
 
-    const jobs = await jobModel.find({author: {$in: loginUser.followingUsers}}).limit(Number(limit)).skip(Number(offset));
-    const job_count = await jobModel.find({author: {$in: loginUser.followingUsers}}).count();
-    return { jobs, job_count };
-};
+//     const jobs = await jobModel.find({author: {$in: loginUser.followingUsers}}).limit(Number(limit)).skip(Number(offset));
+//     const job_count = await jobModel.find({author: {$in: loginUser.followingUsers}}).count();
+//     return { jobs, job_count };
+// };
 
-// LIST ALL JOBS
-const listAllJobs = async (params) => {
+// FIND ALL JOBS
+const findAllJobs = async (params) => {
 
     let { limit, offset, category, contract, workingDay, province, name, salary_min, salary_max, author } = params;
     const name_regex = new RegExp(name);
@@ -101,8 +101,7 @@ const deleteOneJob = async (params) => {
 module.exports = {
     createJob,
     findOneJob,
-    feedAllJobs,
-    listAllJobs,
+    findAllJobs,
     updateJob,
     getJobsByCategory,
     deleteOneJob
