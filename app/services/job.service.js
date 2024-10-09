@@ -98,6 +98,7 @@ const findAllJobs = async (req) => {
     if (!jobs) return resp(404, { message: "No se encontraron trabajos" });
 
     if (req.loggedin) {
+        const loginUser = await authRepo.findById(req.userId);
         res = {
             jobs: await Promise.all(jobs.map(async job => {
                 return await job.toJobResponse(loginUser);
