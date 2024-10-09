@@ -1,4 +1,7 @@
 const WorkingDayService = require("../services/workingDay.service.js");
+
+ // EXPRESS-ASYNC-HANDLER captura los errores generados en operaciones asíncronas y los pasa al midleware de express
+ // no es necesario utilizar los try ... catch
 const asyncHandler = require('express-async-handler');
 
 
@@ -13,7 +16,7 @@ const findAllWorkingDays = asyncHandler(async (req, res) => {
     return res.status(status).json(result)
 });
 
-
+// DELETE ONE
 const deleteOneWorkingDay = asyncHandler(async (req, res) => {
     const { status, result } = await WorkingDayService.deleteOneWorkingDay(req.params);
     return res.status(status).json(result)

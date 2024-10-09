@@ -46,7 +46,7 @@ mongoose.connect(dbConfig.url, {
 });
 
 // require('../routes/category.routes')(app);
-['category', 'job', 'carousel', 'contract', 'workingDay', 'province', 'auth'].forEach(
+['category', 'job', 'carousel', 'contract', 'workingDay', 'province', 'auth', 'companyProfile'].forEach(
     route => require(`../routes/${route}.routes`)(app)
 );
 

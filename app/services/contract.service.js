@@ -1,7 +1,6 @@
 const contractRepo = require("../repositories/contract.repo.js");
 const { resp } = require("../utils/utils.js");
 
-
 const createContract = async (data) => {
     const contract_data = {
         id_contract: data.id_contract || null,
@@ -14,7 +13,9 @@ const createContract = async (data) => {
 
 const findAllContracts = async () => {
     const contracts = await contractRepo.findAllContracts();
-    if (!contracts) return resp(404, { message: "Contratos no encontrados" });
+
+    if (!contracts) return resp(404, { message: "No se encontraron contratos" });
+
     const res = await Promise.all(contracts.map(async contract => {
         return await contract.toContractResponse();
     }));
@@ -24,7 +25,9 @@ const findAllContracts = async () => {
 
 const deleteOneContract = async (params) => {
     const contract = await contractRepo.deleteOneContract(params);
+
     if (!contract) return resp(404, { message: "Contrato no encontrado" });
+
     return resp(200, { message: "Contrato eliminado" });
 };
 

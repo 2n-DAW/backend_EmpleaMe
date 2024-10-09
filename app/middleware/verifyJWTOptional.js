@@ -1,9 +1,7 @@
 const jwt = require('jsonwebtoken');
 
-const verifyJWTOptional = (req, res, next) => { 
+const verifyJWTOptional = (req, res, next) => {
     const authHeader = req.headers.authorization || req.headers.Authorization
-
-    console.log('Optional', authHeader)
 
     if (!authHeader || !authHeader?.startsWith('Token ') || !authHeader.split(' ')[1].length) {
         req.loggedin = false;
@@ -23,7 +21,6 @@ const verifyJWTOptional = (req, res, next) => {
             req.userId = decoded.user.id;
             req.userEmail = decoded.user.email;
             req.userHashedPwd = decoded.user.password;
-            //console.log('Optional', decoded)
             next();
         }
     )

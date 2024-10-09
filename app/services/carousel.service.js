@@ -7,7 +7,7 @@ const getCarouselCategory = async () => {
     const categories = await carouselRepo.getCarouselCategory();
 
     if (!categories) {
-        return resp(404, { message: "Categorías no encontradas" });
+        return resp(404, { message: "No se encontraron categorías" });
     }
 
     const res = await Promise.all(categories.map(async category => {

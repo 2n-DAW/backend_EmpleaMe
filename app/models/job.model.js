@@ -4,6 +4,7 @@ const uniqueValidator = require('mongoose-unique-validator');
 const Contract = require("./contract.model");
 const WorkingDay = require("./workingDay.model");
 const Province = require("./province.model");
+const Auth = require("./auth.model");
 
 const JobSchema = mongoose.Schema({
     slug: {
@@ -16,8 +17,8 @@ const JobSchema = mongoose.Schema({
         required: true
     },
     author: {
-        type: String,
-        required: true
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Auth'
     },
     description: {
         type: String,
@@ -49,6 +50,14 @@ const JobSchema = mongoose.Schema({
         type: String,
         required: false
     },
+    favouritesCount: {
+        type: Number,
+        default: 0
+    },
+    // comments: [{
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'Comment'
+    // }]
 },
 {
     timestamps: true
@@ -67,14 +76,25 @@ JobSchema.methods.slugify = async function () {
     this.slug = slugify(this.name) + '-' + (Math.random() * Math.pow(36, 10) | 0).toString(36);
 };
 
-JobSchema.methods.toJobResponse = async function () {
+JobSchema.methods.updateFavoriteCount = async function () {
+    const favoriteCount = await Auth.count({
+        favouriteJobs: {$in: [this._id]}
+    });
+
+    this.favouritesCount = favoriteCount;
+
+    return this.save();
+}
+
+JobSchema.methods.toJobResponse = async function (user) {
+    const authorObj = await Auth.findById(this.author);
     // const contractObj = await Contract.findById(this.id_contractcontract);
     // const workingDayObj = await WorkingDay.findById(this.id_working_day);
     // const provinceObj = await Province.findById(this.id_province);
     return {
         slug: this.slug,
         name: this.name,
-        author: this.author,
+        author:  authorObj.toProfileJSON(user),
         description: this.description,
         id_contract: this.id_contract,
         id_workingDay: this.id_workingDay,
@@ -84,32 +104,30 @@ JobSchema.methods.toJobResponse = async function () {
         img: this.img,
         id_cat: this.id_cat,
         createdAt: this.createdAt,
-        updatedAt: this.updatedAt
+        updatedAt: this.updatedAt,
+        favorited: user ? user.isFavourite(this._id) : false,
+        favoritesCount: this.favouritesCount
     }
 }
-
-// JobSchema.methods.toAllJobResponse = async function () {
-//     return {
-//         slug: this.slug,
-//         name: this.name,
-//         author: this.author,
-//         description: this.description,
-//         contract: this.contract,
-//         working_day: this.working_day,
-//         province: this.province,
-//         salary: this.salary,
-//         images: this.images,
-//         img: this.img,
-//         id_cat: this.id_cat,
-//         createdAt: this.createdAt,
-//         updatedAt: this.updatedAt
-//     }
-// }
 
 JobSchema.methods.toJobCarouselResponse = async function () {
     return {
         images: this.images
     }
 }
+
+// JobSchema.methods.addComment = function (commentId) {
+//     if(this.comments.indexOf(commentId) === -1){  // cuando metodo indexOf no encuentra el id del comentario, entrega valor -1
+//         this.comments.push(commentId);
+//     }
+//     return this.save();
+// };
+
+// JobSchema.methods.removeComment = function (commentId) {
+//     if(this.comments.indexOf(commentId) !== -1){
+//         this.comments.remove(commentId);
+//     }
+//     return this.save();
+// };
 
 module.exports = mongoose.model('Job', JobSchema);
