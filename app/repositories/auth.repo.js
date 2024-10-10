@@ -3,7 +3,6 @@ const authModel = require('../models/auth.model.js');
 const tokenModel = require('../models/token.model.js');
 const blacklistModel = require('../models/blacklist.model.js');
 const bcrypt = require('bcrypt');
-const user = new authModel();
 
 // LOGIN
 const userLogin = async (emailObject) => {

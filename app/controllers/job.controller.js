@@ -43,8 +43,8 @@ const updateJob = asyncHandler(async (req, res) => {
 
 
 const deleteOneJob = asyncHandler(async (req, res) => {
-    const result = await jobService.deleteOneJob(req);
-    return res.status(200).json(result);
+    const { status, result } = await jobService.deleteOneJob(req);
+    return res.status(status).json(result);
 });
 
 const favoriteJob = asyncHandler(async (req, res) => {
@@ -53,8 +53,8 @@ const favoriteJob = asyncHandler(async (req, res) => {
 });
 
 const unfavoriteJob = asyncHandler(async (req, res) => {
-    const result = await jobService.unfavoriteJob(req);
-    return res.status(200).json(result);
+    const { status, result } = await jobService.unfavoriteJob(req);
+    return res.status(status).json(result);
 });
 
 

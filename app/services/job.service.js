@@ -148,7 +148,7 @@ const unfavoriteJob = async (req) => {
     const idUser = req.userId;
 
     const { slug } = req.params;
-    const loginUser = authRepo.findById(idUser);
+    const loginUser = await authRepo.findById(idUser);
 
     if (!loginUser) return resp(404, { message: "Usuario no encontrado" });
 
@@ -158,11 +158,9 @@ const unfavoriteJob = async (req) => {
 
     await authRepo.unfavorite(loginUser, job._id);
 
-    const updatedJob = await jobRepo.updateFavouriteCount(job);
+    const updatedJob = await jobRepo.updateFavoriteCount(job);
 
-    console.log('sadasdasd', updatedJob);
-
-    return resp(200, { updateJob });
+    return resp(200, { job: await jobRepo.toJobResponse(updatedJob, loginUser) });
 
 };
 
