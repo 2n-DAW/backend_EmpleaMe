@@ -1,9 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 const uniqueValidator = require('mongoose-unique-validator');
-const Contract = require("./contract.model");
-const WorkingDay = require("./workingDay.model");
-const Province = require("./province.model");
 const Auth = require("./auth.model");
 
 const JobSchema = mongoose.Schema({
@@ -116,18 +113,12 @@ JobSchema.methods.toJobCarouselResponse = async function () {
     }
 }
 
-// JobSchema.methods.addComment = function (commentId) {
-//     if(this.comments.indexOf(commentId) === -1){  // cuando metodo indexOf no encuentra el id del comentario, entrega valor -1
-//         this.comments.push(commentId);
-//     }
-//     return this.save();
-// };
-
-// JobSchema.methods.removeComment = function (commentId) {
-//     if(this.comments.indexOf(commentId) !== -1){
-//         this.comments.remove(commentId);
-//     }
-//     return this.save();
-// };
+JobSchema.methods.updateFavoriteCount = async function () {
+    const favoriteCount = await Auth.count({
+        favouriteJobs: { $in: [this._id] }
+    });
+    this.favouritesCount = favoriteCount;
+    return this.save();
+}
 
 module.exports = mongoose.model('Job', JobSchema);

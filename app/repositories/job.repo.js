@@ -11,22 +11,10 @@ const createJob = async (data) => {
 
 // FIND ONE
 const findOneJob = async (params) => {
-    return await jobModel.findOne(params);
+    const res = await jobModel.findOne(params);
+    return res;
 };
 
-// // FEED ALL JOBS
-// const feedAllJobs = async (params, loginUser) => {
-//     let { limit, offset } = params;
-
-//     limit = isNotUndefined(limit) ? parseInt(limit) : 3;
-//     offset = isNotUndefined(offset) ? parseInt(offset) : 0;
-
-//     console.log(params);
-
-//     const jobs = await jobModel.find({author: {$in: loginUser.followingUsers}}).limit(Number(limit)).skip(Number(offset));
-//     const job_count = await jobModel.find({author: {$in: loginUser.followingUsers}}).count();
-//     return { jobs, job_count };
-// };
 
 // FIND ALL JOBS
 const findAllJobs = async (params) => {
@@ -96,11 +84,22 @@ const deleteOneJob = async (params) => {
     return await jobModel.deleteOne(params);
 }
 
+const updateFavoriteCount = async (job) => {
+    return await job.updateFavoriteCount();
+}
+
+const toJobResponse = async (job, user) => {
+    return await job.toJobResponse(user);
+}
+
+
 module.exports = {
     createJob,
     findOneJob,
     findAllJobs,
     updateJob,
     getJobsByCategory,
-    deleteOneJob
+    deleteOneJob,
+    updateFavoriteCount,
+    toJobResponse
 }

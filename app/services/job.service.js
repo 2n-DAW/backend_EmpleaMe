@@ -1,11 +1,9 @@
 // SERVICES: toda la lógica de negocio
 const jobRepo = require('../repositories/job.repo.js');
 const categoryRepo = require('../repositories/category.repo.js');
-const contractRepo = require('../repositories/contract.repo.js');
-const workingDayRepo = require('../repositories/workingDay.repo.js');
-const provinceRepo = require('../repositories/province.repo.js');
 const authRepo = require('../repositories/auth.repo.js');
 const { resp } = require('../utils/utils.js');
+const jobModel = require('../models/job.model.js');
 
 // CREATE
 const createJob = async (req) => {
@@ -18,26 +16,6 @@ const createJob = async (req) => {
     const category = await categoryRepo.findOneCategory({ id_cat });
     if (!category) return resp(404, { message: "Categoria no encontrada" });
 
-    // comprueba si existe el id de contrato en su respectiva colección
-    // const id_contract = data.contract;
-    // const contract = await contractRepo.findContractId(id_contract);
-    // if (!contract) {
-    //     return { message: "Contrato no encontrado" };
-    // }
-
-    // comprueba si existe el id de workingDay en su respectiva colección
-    // const id_workingDay = data.working_day;
-    // const workingDay = await workingDayRepo.findWorkingDayId(id_workingDay);
-    // if (!workingDay) {
-    //     return { message: "Jornada no encontrada" };
-    // }
-
-    // comprueba si existe el id de province en su respectiva colección
-    // const id_province = data.province;
-    // const province = await provinceRepo.findProvinceId(id_province);
-    // if (!province) {
-    //     return { message: "Provincia no encontrada" };
-    // }
 
     const job_data = {
         name: req.body.name || null,
@@ -68,28 +46,6 @@ const findOneJob = async (params) => {
     return resp(200, { job: await job.toJobResponse() });
 };
 
-// // FEED ALL JOBS
-// const feedAllJobs = async (req, params) => {
-//     const userId = req.userId;
-//     const loginUser = await authRepo.findById(userId);
-
-//     if (!loginUser) {
-//         return { message: "Usuario no encontrado" };
-//     }
-
-//     const { jobs, job_count } = await jobRepo.feedAllJobs(params, loginUser);
-
-//     if (!jobs) {
-//         return { message: "No se encontraron trabajos" };
-//     }
-
-//     return {
-//         jobs: await Promise.all(jobs.map(async job => {
-//             return await job.toJobResponse(loginUser);
-//         })),
-//         job_count
-//     };
-// };
 
 // FIND ALL JOBS
 const findAllJobs = async (req) => {
@@ -164,6 +120,52 @@ const deleteOneJob = async (req) => {
     }
 };
 
+// FAVORITE
+const favoriteJob = async (req) => {
+
+
+    const idUser = req.userId;
+
+    const { slug } = req.params;
+    const loginUser = await authRepo.findById(idUser);
+
+
+    if (!loginUser) return resp(404, { message: "Usuario no encontrado" });
+
+    const job = await jobRepo.findOneJob({ slug });
+    if (!job) return resp(404, { message: "Trabajo no encontrado" });
+
+    await authRepo.favorite(loginUser, job._id);
+
+    const updatedJob = await jobRepo.updateFavoriteCount(job);
+
+    return resp(200, { job: await jobRepo.toJobResponse(updatedJob, loginUser) });
+
+};
+
+// UNFAVORITE
+const unfavoriteJob = async (req) => {
+    const idUser = req.userId;
+
+    const { slug } = req.params;
+    const loginUser = authRepo.findById(idUser);
+
+    if (!loginUser) return resp(404, { message: "Usuario no encontrado" });
+
+    const job = await jobRepo.findOneJob({ slug });
+
+    if (!job) return resp(404, { message: "Trabajo no encontrado" });
+
+    await authRepo.unfavorite(loginUser, job._id);
+
+    const updatedJob = await jobRepo.updateFavouriteCount(job);
+
+    console.log('sadasdasd', updatedJob);
+
+    return resp(200, { updateJob });
+
+};
+
 
 module.exports = {
     createJob,
@@ -171,5 +173,7 @@ module.exports = {
     findAllJobs,
     updateJob,
     getJobsByCategory,
-    deleteOneJob
+    deleteOneJob,
+    favoriteJob,
+    unfavoriteJob
 }

@@ -145,4 +145,5 @@ AuthSchema.methods.unfavorite = function (id) {
     return this.save();
 };
 
+
 module.exports = mongoose.model('Auth', AuthSchema);

@@ -39,13 +39,23 @@ const getJobsByCategory = asyncHandler(async (req, res) => {
 const updateJob = asyncHandler(async (req, res) => {
     const { status, result } = await jobService.updateJob(req);
     return res.status(status).json(result);
-})
+});
 
 
 const deleteOneJob = asyncHandler(async (req, res) => {
     const result = await jobService.deleteOneJob(req);
     return res.status(200).json(result);
-})
+});
+
+const favoriteJob = asyncHandler(async (req, res) => {
+    const { status, result } = await jobService.favoriteJob(req);
+    return res.status(status).json(result);
+});
+
+const unfavoriteJob = asyncHandler(async (req, res) => {
+    const result = await jobService.unfavoriteJob(req);
+    return res.status(200).json(result);
+});
 
 
 module.exports = {
@@ -54,5 +64,7 @@ module.exports = {
     findAllJobs,
     updateJob,
     getJobsByCategory,
-    deleteOneJob
+    deleteOneJob,
+    favoriteJob,
+    unfavoriteJob
 }

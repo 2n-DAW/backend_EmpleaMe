@@ -1,5 +1,5 @@
-// SERVICES: toda la lógica de negocio
 const authRepo = require('../repositories/auth.repo.js');
+const repoJob = require('../repositories/job.repo.js');
 const { resp } = require("../utils/utils.js");
 const bcrypt = require('bcrypt');
 
@@ -98,10 +98,12 @@ const logout = async (accessToken) => {
     return resp(200, { message: 'Deslogeado correctamente' });
 };
 
+
 module.exports = {
     userLogin,
     registerUser,
     getCurrentUser,
     updateUser,
-    logout
+    logout,
+
 }

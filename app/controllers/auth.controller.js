@@ -49,5 +49,5 @@ module.exports = {
     registerUser,
     getCurrentUser,
     updateUser,
-    logout
+    logout,
 }

@@ -3,6 +3,7 @@ const authModel = require('../models/auth.model.js');
 const tokenModel = require('../models/token.model.js');
 const blacklistModel = require('../models/blacklist.model.js');
 const bcrypt = require('bcrypt');
+const user = new authModel();
 
 // LOGIN
 const userLogin = async (emailObject) => {
@@ -48,7 +49,8 @@ const updateUser = async (emailObject, user) => {
 
 // FIND BY ID
 const findById = async (id) => {
-    return await authModel.findById(id);
+    const res = await authModel.findById(id);
+    return res;
 };
 
 // SAVE TOKEN
@@ -95,6 +97,17 @@ const createBlacklistToken = async (refresh) => {
 const deleteOneRefresh = async (refresh) => {
     return await tokenModel.deleteOne({ refreshToken: refresh });
 }
+// FAVORITE
+const favorite = async (user, jobId) => {
+
+    return await user.favorite(jobId);
+};
+
+// UNFAVORITE
+const unfavorite = async (user, jobId) => {
+    return await user.unfavorite(jobId);
+};
+
 
 module.exports = {
     userLogin,
@@ -106,5 +119,7 @@ module.exports = {
     findOneToken,
     isBlacklisted,
     createBlacklistToken,
-    deleteOneRefresh
+    deleteOneRefresh,
+    favorite,
+    unfavorite
 }
