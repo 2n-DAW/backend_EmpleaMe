@@ -1,22 +1,21 @@
-// REPOSITORIES: operaciones con la base de datos
 const jobModel = require('../models/job.model.js');
 const authRepo = require('../repositories/auth.repo.js');
 const { isNotUndefined } = require('../shared/utils/utils.js');
 
-// CREATE
+
 const createJob = async (data) => {
     const job = await new jobModel(data); //creamos un nuevo objeto de tipo jobModel
     return await job.save(); //guardamos el objeto en la base de datos
 };
 
-// FIND ONE
+
 const findOneJob = async (params) => {
     const res = await jobModel.findOne(params);
     return res;
 };
 
 
-// FIND ALL JOBS
+
 const findAllJobs = async (params) => {
 
     let { limit, offset, category, contract, workingDay, province, name, salary_min, salary_max, author } = params;
@@ -55,18 +54,17 @@ const findAllJobs = async (params) => {
     return { jobs, job_count };
 };
 
-// GET JOBS BY CATEGORY
+
 const getJobsByCategory = async (jobId) => {
     return await jobModel.findById(jobId);
 };
 
-// UPDATE
+
 const updateJob = async (params, updateData) => {
     const job = await jobModel.findOne(params); //buscamos el objeto en la base de datos
 
     if (job) {
         const { name, salary, description, img, images } = updateData;
-
         job.name = name || job.name;
         job.salary = salary || job.salary;
         job.description = description || job.description;
@@ -79,7 +77,7 @@ const updateJob = async (params, updateData) => {
     return null;
 };
 
-// DELETE ONE
+
 const deleteOneJob = async (params) => {
     return await jobModel.deleteOne(params);
 }

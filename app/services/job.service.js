@@ -1,36 +1,33 @@
-// SERVICES: toda la lógica de negocio
 const jobRepo = require('../repositories/job.repo.js');
 const categoryRepo = require('../repositories/category.repo.js');
 const authRepo = require('../repositories/auth.repo.js');
 const { resp } = require('../utils/utils.js');
-const jobModel = require('../models/job.model.js');
 
-// CREATE
+
 const createJob = async (req) => {
     const id = req.userId;
+    const { name, description, salary, images, img, id_cat, id_contract, id_workingDay, id_province } = req.body;
+
     const author = await authRepo.findById(id);
     if (!author) return resp(404, { message: "Usuario no logeado" });
-
-    // comprueba si existe el id de categoria en su respectiva colección
-    const id_cat = req.body.id_cat;
     const category = await categoryRepo.findOneCategory({ id_cat });
     if (!category) return resp(404, { message: "Categoria no encontrada" });
 
 
     const job_data = {
-        name: req.body.name || null,
-        description: req.body.description || null,
-        salary: req.body.salary || null,
-        images: req.body.images,
-        img: req.body.img || null,
-        id_cat: req.body.id_cat || null,
-        id_contract: req.body.id_contract || null,
-        id_workingDay: req.body.id_workingDay || null,
-        id_province: req.body.id_province || null,
+        name: name || null,
+        description: description || null,
+        salary: salary || null,
+        images: images,
+        img: img || null,
+        id_cat: id_cat || null,
+        id_contract: id_contract || null,
+        id_workingDay: id_workingDay || null,
+        id_province: id_province || null,
         author: id
     };
 
-    const newJob = await jobRepo.createJob(job_data);
+    const { newJob } = await jobRepo.createJob(job_data);
     if (!newJob) return resp(400, { message: "No se pudo crear el trabajo" });
 
     await category.addJob(newJob._id); //añadir trabajo a la categoría
@@ -47,7 +44,6 @@ const findOneJob = async (params) => {
 };
 
 
-// FIND ALL JOBS
 const findAllJobs = async (req) => {
     const { jobs, job_count } = await jobRepo.findAllJobs(req.query);
 
@@ -86,24 +82,24 @@ const getJobsByCategory = async (params) => {
     return resp(200, { jobs: res });
 };
 
-// UPDATE
+
 const updateJob = async (req) => {
     const updatedJob = await jobRepo.updateJob(req.params, req.body);
     if (!updatedJob) return resp(400, { message: "No se pudo actualizar el trabajo" });
 
-    const userId  = req.userId;
+    const userId = req.userId;
     const loginUser = await authRepo.findById(userId);
     if (!loginUser) return resp(404, { message: "Usuario no encontrado" });
 
     return resp(200, await updatedJob.toJobResponse(loginUser));
 };
 
-// DELETE
+
 const deleteOneJob = async (req) => {
     const job = await jobRepo.findOneJob(req.params);
     if (!job) return resp(404, { message: "Trabajo no encontrado" });
 
-    const userId  = req.userId;
+    const userId = req.userId;
     const loginUser = await authRepo.findById(userId);
     if (!loginUser) return resp(404, { message: "Usuario no encontrado" });
 
@@ -120,48 +116,30 @@ const deleteOneJob = async (req) => {
     }
 };
 
-// FAVORITE
+
 const favoriteJob = async (req) => {
-
-
     const idUser = req.userId;
-
     const { slug } = req.params;
     const loginUser = await authRepo.findById(idUser);
-
-
     if (!loginUser) return resp(404, { message: "Usuario no encontrado" });
-
     const job = await jobRepo.findOneJob({ slug });
     if (!job) return resp(404, { message: "Trabajo no encontrado" });
-
     await authRepo.favorite(loginUser, job._id);
-
     const updatedJob = await jobRepo.updateFavoriteCount(job);
-
     return resp(200, { job: await jobRepo.toJobResponse(updatedJob, loginUser) });
-
 };
 
-// UNFAVORITE
+
 const unfavoriteJob = async (req) => {
     const idUser = req.userId;
-
     const { slug } = req.params;
     const loginUser = await authRepo.findById(idUser);
-
     if (!loginUser) return resp(404, { message: "Usuario no encontrado" });
-
     const job = await jobRepo.findOneJob({ slug });
-
     if (!job) return resp(404, { message: "Trabajo no encontrado" });
-
     await authRepo.unfavorite(loginUser, job._id);
-
     const updatedJob = await jobRepo.updateFavoriteCount(job);
-
     return resp(200, { job: await jobRepo.toJobResponse(updatedJob, loginUser) });
-
 };
 
 

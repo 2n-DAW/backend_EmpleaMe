@@ -7,6 +7,7 @@ const bcrypt = require('bcrypt');
 const userLogin = async (data) => {
     const { user } = data;
 
+
     // confirm data
     if (!user || !user.email || !user.password) {
         return resp(400, { message: "Todos los campos son necesarios" });
@@ -91,7 +92,6 @@ const logout = async (accessToken) => {
     const refreshToken =refreshTokenFinded.refreshToken;
 
     if (!refreshToken) return { status: 404, result: { message: "Tokens no encontrados" } };
-
     await authRepo.createBlacklistToken(refreshToken);
     await authRepo.deleteOneRefresh(refreshToken);
 

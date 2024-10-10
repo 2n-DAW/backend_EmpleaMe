@@ -1,7 +1,4 @@
 const provinceService = require("../services/province.service.js");
-
- // EXPRESS-ASYNC-HANDLER captura los errores generados en operaciones asíncronas y los pasa al midleware de express
- // no es necesario utilizar los try ... catch
 const asyncHandler = require('express-async-handler');
 
 

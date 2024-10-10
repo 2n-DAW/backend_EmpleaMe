@@ -1,8 +1,7 @@
-// SERVICES: toda la lógica de negocio
 const companyProfileRepo = require('../repositories/companyProfile.repo.js');
 const { resp } = require("../utils/utils.js");
 
-// GET PROFILE
+
 const getProfile = async (req) => {
     const { username } = req.params;
     const loggedin = req.loggedin;
@@ -21,7 +20,7 @@ const getProfile = async (req) => {
     }
 };
 
-// FOLLOW A USER
+
 const followUser = async (req) => {
     const { username } = req.params;
 
@@ -36,7 +35,7 @@ const followUser = async (req) => {
     return resp(200, { profile: user.toProfileJSON(loginUser) });
 };
 
-// UNFOLLOW A USER
+
 const unFollowUser = async (req) => {
     const { username } = req.params;
 

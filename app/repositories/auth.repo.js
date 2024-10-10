@@ -1,4 +1,3 @@
-// REPOSITORIES: operaciones con la base de datos
 const authModel = require('../models/auth.model.js');
 const tokenModel = require('../models/token.model.js');
 const blacklistModel = require('../models/blacklist.model.js');

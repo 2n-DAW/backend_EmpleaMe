@@ -6,9 +6,6 @@ module.exports = (app) => {
 
     app.post('/jobs', verifyJWT, createJob);
 
-    // // feed endpoint must go before :slug endpoint
-    // app.get('/jobs/feed', verifyJWT, feedAllJobs);
-
     app.get('/jobs', verifyJWTOptional, findAllJobs);
 
     app.get('/jobs/:slug', findOneJob);
