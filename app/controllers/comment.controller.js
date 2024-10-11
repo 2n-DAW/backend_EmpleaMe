@@ -9,14 +9,14 @@ const addCommentsToJob = asyncHandler(async (req, res) => {
 
 
 const getCommentsFromJob = asyncHandler(async (req, res) => {
-    // const { status, result } = await commentService.getCommentsFromJob(req);
-    // return res.status(status).json(result);
+    const { status, result } = await commentService.getCommentsFromJob(req);
+    return res.status(status).json(result);
 });
 
 
 const deleteComment = asyncHandler(async (req, res) => {
-    // const { status, result } = await commentService.deleteComment(req);
-    // return res.status(status).json(result);
+    const { status, result } = await commentService.deleteComment(req);
+    return res.status(status).json(result);
 });
 
 
