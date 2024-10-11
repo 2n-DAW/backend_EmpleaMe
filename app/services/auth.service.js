@@ -1,11 +1,12 @@
-// SERVICES: toda la lógica de negocio
 const authRepo = require('../repositories/auth.repo.js');
+const repoJob = require('../repositories/job.repo.js');
 const { resp } = require("../utils/utils.js");
 const bcrypt = require('bcrypt');
 
 // LOGIN
 const userLogin = async (data) => {
     const { user } = data;
+
 
     // confirm data
     if (!user || !user.email || !user.password) {
@@ -91,17 +92,18 @@ const logout = async (accessToken) => {
     const refreshToken =refreshTokenFinded.refreshToken;
 
     if (!refreshToken) return { status: 404, result: { message: "Tokens no encontrados" } };
-
     await authRepo.createBlacklistToken(refreshToken);
     await authRepo.deleteOneRefresh(refreshToken);
 
     return resp(200, { message: 'Deslogeado correctamente' });
 };
 
+
 module.exports = {
     userLogin,
     registerUser,
     getCurrentUser,
     updateUser,
-    logout
+    logout,
+
 }
