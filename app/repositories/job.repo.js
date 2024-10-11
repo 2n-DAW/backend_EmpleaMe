@@ -94,6 +94,10 @@ const addComment = async (job, comment_id) => {
     return await job.addComment(comment_id);
 }
 
+const removeComment = async (job, comment_id) => {
+    return await job.removeComment(comment_id);
+}
+
 
 
 module.exports = {
@@ -105,5 +109,6 @@ module.exports = {
     deleteOneJob,
     updateFavoriteCount,
     toJobResponse,
-    addComment
+    addComment,
+    removeComment
 }
