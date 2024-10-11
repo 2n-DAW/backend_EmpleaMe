@@ -90,6 +90,11 @@ const toJobResponse = async (job, user) => {
     return await job.toJobResponse(user);
 }
 
+const addComment = async (job, comment_id) => {
+    return await job.addComment(comment_id);
+}
+
+
 
 module.exports = {
     createJob,
@@ -99,5 +104,6 @@ module.exports = {
     getJobsByCategory,
     deleteOneJob,
     updateFavoriteCount,
-    toJobResponse
+    toJobResponse,
+    addComment
 }
