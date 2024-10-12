@@ -18,5 +18,5 @@ const unFollowUser = async (loginUser, user_id) => {
 module.exports = {
     getProfile ,
     followUser,
-    unFollowUser
+    unFollowUser,
 }
