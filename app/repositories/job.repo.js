@@ -114,5 +114,5 @@ module.exports = {
     toJobResponse,
     addComment,
     removeComment,
-    getUserJobs
+    getUserJobs,
 }

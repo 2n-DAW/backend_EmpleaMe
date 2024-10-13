@@ -64,9 +64,27 @@ const getUserJobs = async (req) => {
     return resp(200, { jobs, job_count: jobs.length, is_owner });
 };
 
+const getUserLikes = async (req) => {
+    const { username } = req.params;
+    const user = await companyProfileRepo.getProfile({ username });
+    console.log(user);
+    if (!user) return resp(404, { message: "Usuario no encontrado" });
+
+
+    let likes = await Promise.all(user.favouriteJobs.map(async (jobId) => {
+        const job = await jobRepo.findOneJob({ _id: jobId });
+        return await job.toJobResponse(user);
+    }));
+
+    console.log(likes);
+
+    return resp(200, { likes, likes_count: likes.length, is_owner: req.same_User });
+};
+
 module.exports = {
     getProfile,
     followUser,
     unFollowUser,
-    getUserJobs
+    getUserJobs,
+    getUserLikes
 }
