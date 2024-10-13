@@ -91,7 +91,7 @@ const getUserFollowers = async (req) => {
 
     console.log(followers);
 
-    return resp(200, { followers });
+    return resp(200, { users: followers, users_count: followers.length, is_owner: req.same_User });
 };
 
 module.exports = {
