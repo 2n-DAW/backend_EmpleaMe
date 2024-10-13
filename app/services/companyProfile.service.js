@@ -71,14 +71,13 @@ const getUserLikes = async (req) => {
     if (!user) return resp(404, { message: "Usuario no encontrado" });
 
 
-    let likes = await Promise.all(user.favouriteJobs.map(async (jobId) => {
+    let jobs = await Promise.all(user.favouriteJobs.map(async (jobId) => {
         const job = await jobRepo.findOneJob({ _id: jobId });
         return await job.toJobResponse(user);
     }));
 
-    console.log(likes);
 
-    return resp(200, { likes, likes_count: likes.length, is_owner: req.same_User });
+    return resp(200, { jobs, jobs_count: jobs.length, is_owner: req.same_User });
 };
 
 module.exports = {
