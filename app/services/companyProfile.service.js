@@ -1,4 +1,5 @@
 const companyProfileRepo = require('../repositories/companyProfile.repo.js');
+const jobRepo = require('../repositories/job.repo.js');
 const { resp } = require("../utils/utils.js");
 
 
@@ -50,8 +51,66 @@ const unFollowUser = async (req) => {
     return resp(200, { profile: user.toProfileJSON(loginUser) });
 };
 
+const getUserJobs = async (req) => {
+    const is_owner = req.same_User;
+    const { username } = req.params;
+    const user = await companyProfileRepo.getProfile({ username });
+    if (!user) return resp(404, { message: "Usuario no encontrado" });
+
+    const jobs = await jobRepo.getUserJobs(user);
+
+    const res = await Promise.all(jobs.map(async (job) => {
+        return await job.toJobResponse(user);
+    })
+    );
+
+    return resp(200, { jobs: res, job_count: jobs.length, is_owner });
+};
+
+const getUserLikes = async (req) => {
+    const { username } = req.params;
+    const user = await companyProfileRepo.getProfile({ username });
+    console.log(user);
+    if (!user) return resp(404, { message: "Usuario no encontrado" });
+
+
+    let jobs = await Promise.all(user.favouriteJobs.map(async (jobId) => {
+        const job = await jobRepo.findOneJob({ _id: jobId });
+        return await job.toJobResponse(user);
+    }));
+    return resp(200, { jobs, jobs_count: jobs.length, is_owner: req.same_User });
+};
+
+const getUserFollowers = async (req) => {
+    const { username } = req.params;
+    const query = req.query;
+    const user = await companyProfileRepo.getProfile({ username });
+    if (!user) return resp(404, { message: "Usuario no encontrado" });
+
+    const followers = await companyProfileRepo.getUserFollowers(user, query);
+
+    console.log(followers);
+
+    return resp(200, { users: followers, users_count: followers.length, is_owner: req.same_User });
+};
+
+const getUserFollowing = async (req) => {
+    const { username } = req.params;
+    const query = req.query;
+    const user = await companyProfileRepo.getProfile({ username });
+    if (!user) return resp(404, { message: "Usuario no encontrado" });
+
+    const following = await companyProfileRepo.getUserFollowing(user, query);
+    console.log(following);
+    return resp(200, { users: following, users_count: following.length, is_owner: req.same_User });
+};
+
 module.exports = {
     getProfile,
     followUser,
-    unFollowUser
+    unFollowUser,
+    getUserJobs,
+    getUserLikes,
+    getUserFollowers,
+    getUserFollowing
 }

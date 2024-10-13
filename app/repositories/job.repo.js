@@ -98,6 +98,9 @@ const removeComment = async (job, comment_id) => {
     return await job.removeComment(comment_id);
 }
 
+const getUserJobs = async (data) => {
+    return await jobModel.find({ author: data._id });
+}
 
 
 module.exports = {
@@ -110,5 +113,6 @@ module.exports = {
     updateFavoriteCount,
     toJobResponse,
     addComment,
-    removeComment
+    removeComment,
+    getUserJobs,
 }

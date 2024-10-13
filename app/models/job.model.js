@@ -85,9 +85,6 @@ JobSchema.methods.updateFavoriteCount = async function () {
 
 JobSchema.methods.toJobResponse = async function (user) {
     const authorObj = await Auth.findById(this.author);
-    // const contractObj = await Contract.findById(this.id_contractcontract);
-    // const workingDayObj = await WorkingDay.findById(this.id_working_day);
-    // const provinceObj = await Province.findById(this.id_province);
     return {
         slug: this.slug,
         name: this.name,
