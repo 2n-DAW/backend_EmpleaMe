@@ -1,7 +1,7 @@
 const authModel = require('../models/auth.model.js');
 
 
-const getProfile  = async (data) => {
+const getProfile = async (data) => {
     return await authModel.findOne(data);
 };
 
@@ -20,9 +20,15 @@ const getUserFollowers = async (user, query) => {
     return await authModel.find({ followingUsers: user._id }, {}, { skip: Number(offset), limit: Number(limit) });
 };
 
+const getUserFollowing = async (user, query) => {
+    const { offset, limit } = query;
+    return await authModel.find({ _id: { $in: user.followingUsers } }, {}, { skip: Number(offset), limit: Number(limit) });
+};
+
 module.exports = {
-    getProfile ,
+    getProfile,
     followUser,
     unFollowUser,
-    getUserFollowers
+    getUserFollowers,
+    getUserFollowing
 }

@@ -2,7 +2,7 @@ const verifyJWT = require('../middleware/verifyJWT.js');
 const verifyJWTOptional = require('../middleware/verifyJWTOptional.js');
 const verifyUserJWT = require('../middleware/verifyUserJWT.js');
 module.exports = (app) => {
-    const { getProfile, followUser, unFollowUser, getUserJobs, getUserLikes, getUserFollowers } = require('../controllers/companyProfile.controller.js');
+    const { getProfile, followUser, unFollowUser, getUserJobs, getUserLikes, getUserFollowers, getUserFollowing } = require('../controllers/companyProfile.controller.js');
 
     // Get profile - authentication optional
     app.get('/profiles/:username', verifyJWTOptional, getProfile);
@@ -18,4 +18,6 @@ module.exports = (app) => {
     app.get('/profiles/:username/likes', verifyUserJWT, getUserLikes);
 
     app.get('/profiles/:username/followers', verifyUserJWT, getUserFollowers);
+
+    app.get('/profiles/:username/following', verifyUserJWT, getUserFollowing);
 }

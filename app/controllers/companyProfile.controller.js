@@ -17,22 +17,27 @@ const followUser = asyncHandler(async (req, res) => {
 const unFollowUser = asyncHandler(async (req, res) => {
     const { status, result } = await companyProfileService.unFollowUser(req);
     return res.status(status).json(result);
-})
+});
 
 const getUserJobs = asyncHandler(async (req, res) => {
     const { status, result } = await companyProfileService.getUserJobs(req);
     return res.status(status).json(result);
-})
+});
 
 const getUserLikes = asyncHandler(async (req, res) => {
     const { status, result } = await companyProfileService.getUserLikes(req);
     return res.status(status).json(result);
-})
+});
 
 const getUserFollowers = asyncHandler(async (req, res) => {
     const { status, result } = await companyProfileService.getUserFollowers(req);
     return res.status(status).json(result);
-})
+});
+
+const getUserFollowing = asyncHandler(async (req, res) => {
+    const { status, result } = await companyProfileService.getUserFollowing(req);
+    return res.status(status).json(result);
+});
 
 module.exports = {
     getProfile,
@@ -40,5 +45,6 @@ module.exports = {
     unFollowUser,
     getUserJobs,
     getUserLikes,
-    getUserFollowers
+    getUserFollowers,
+    getUserFollowing
 }

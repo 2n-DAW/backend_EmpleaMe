@@ -94,11 +94,23 @@ const getUserFollowers = async (req) => {
     return resp(200, { users: followers, users_count: followers.length, is_owner: req.same_User });
 };
 
+const getUserFollowing = async (req) => {
+    const { username } = req.params;
+    const query = req.query;
+    const user = await companyProfileRepo.getProfile({ username });
+    if (!user) return resp(404, { message: "Usuario no encontrado" });
+
+    const following = await companyProfileRepo.getUserFollowing(user, query);
+    console.log(following);
+    return resp(200, { users: following, users_count: following.length, is_owner: req.same_User });
+};
+
 module.exports = {
     getProfile,
     followUser,
     unFollowUser,
     getUserJobs,
     getUserLikes,
-    getUserFollowers
+    getUserFollowers,
+    getUserFollowing
 }
