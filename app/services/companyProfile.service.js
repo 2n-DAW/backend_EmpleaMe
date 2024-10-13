@@ -78,9 +78,20 @@ const getUserLikes = async (req) => {
         const job = await jobRepo.findOneJob({ _id: jobId });
         return await job.toJobResponse(user);
     }));
-
-
     return resp(200, { jobs, jobs_count: jobs.length, is_owner: req.same_User });
+};
+
+const getUserFollowers = async (req) => {
+    const { username } = req.params;
+    const query = req.query;
+    const user = await companyProfileRepo.getProfile({ username });
+    if (!user) return resp(404, { message: "Usuario no encontrado" });
+
+    const followers = await companyProfileRepo.getUserFollowers(user, query);
+
+    console.log(followers);
+
+    return resp(200, { followers });
 };
 
 module.exports = {
@@ -88,5 +99,6 @@ module.exports = {
     followUser,
     unFollowUser,
     getUserJobs,
-    getUserLikes
+    getUserLikes,
+    getUserFollowers
 }

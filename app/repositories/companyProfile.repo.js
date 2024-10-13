@@ -15,8 +15,14 @@ const unFollowUser = async (loginUser, user_id) => {
     loginUser.unfollow(user_id);
 };
 
+const getUserFollowers = async (user, query) => {
+    const { offset, limit } = query;
+    return await authModel.find({ followingUsers: user._id }, {}, { skip: Number(offset), limit: Number(limit) });
+};
+
 module.exports = {
     getProfile ,
     followUser,
     unFollowUser,
+    getUserFollowers
 }

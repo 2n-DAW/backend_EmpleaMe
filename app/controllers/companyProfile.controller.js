@@ -29,10 +29,16 @@ const getUserLikes = asyncHandler(async (req, res) => {
     return res.status(status).json(result);
 })
 
+const getUserFollowers = asyncHandler(async (req, res) => {
+    const { status, result } = await companyProfileService.getUserFollowers(req);
+    return res.status(status).json(result);
+})
+
 module.exports = {
     getProfile,
     followUser,
     unFollowUser,
     getUserJobs,
-    getUserLikes
+    getUserLikes,
+    getUserFollowers
 }
