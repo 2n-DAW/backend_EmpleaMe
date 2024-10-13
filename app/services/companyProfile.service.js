@@ -55,13 +55,16 @@ const getUserJobs = async (req) => {
     const is_owner = req.same_User;
     const { username } = req.params;
     const user = await companyProfileRepo.getProfile({ username });
-
     if (!user) return resp(404, { message: "Usuario no encontrado" });
 
     const jobs = await jobRepo.getUserJobs(user);
-    console.log(jobs.length);
-    console.log(is_owner);
-    return resp(200, { jobs, job_count: jobs.length, is_owner });
+
+    const res = await Promise.all(jobs.map(async (job) => {
+        return await job.toJobResponse(user);
+    })
+    );
+
+    return resp(200, { jobs: res, job_count: jobs.length, is_owner });
 };
 
 const getUserLikes = async (req) => {
