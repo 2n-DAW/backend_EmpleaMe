@@ -8,7 +8,7 @@ const createJob = asyncHandler(async (req, res) => {
 
 
 const findOneJob = asyncHandler(async (req, res) => {
-    const { status, result } = await jobService.findOneJob(req.params);
+    const { status, result } = await jobService.findOneJob(req);
     return res.status(status).json(result);
 });
 

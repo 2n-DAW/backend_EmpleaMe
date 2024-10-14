@@ -35,12 +35,19 @@ const createJob = async (req) => {
 };
 
 
-const findOneJob = async (params) => {
-    const job = await jobRepo.findOneJob(params);
+const findOneJob = async (req) => {
+    const job = await jobRepo.findOneJob(req.params);
 
     if (!job) return resp(404, { message: "Trabajo no encontrado" });
 
-    return resp(200, { job: await job.toJobResponse() });
+    if (req.loggedin) {
+        const loginUser = await authRepo.findById(req.userId);
+        res = { job: await job.toJobResponse(loginUser) };
+    } else {
+        res = { job: await job.toJobResponse(false) };
+    }
+
+    return resp(200, res);
 };
 
 

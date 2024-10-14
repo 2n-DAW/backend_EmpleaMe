@@ -8,7 +8,7 @@ module.exports = (app) => {
 
     app.get('/jobs', verifyJWTOptional, findAllJobs);
 
-    app.get('/jobs/:slug', findOneJob);
+    app.get('/jobs/:slug', verifyJWTOptional, findOneJob);
 
     app.get('/jobsByCategory/:slug', getJobsByCategory);
 
