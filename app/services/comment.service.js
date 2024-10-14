@@ -31,29 +31,33 @@ const addCommentsToJob = async (req) => {
 
 const getCommentsFromJob = async (req) => {
     const { slug } = req.params;
-    const job = await jobRepo.findOneJob({ slug });
-    if (!job) return resp(404, { message: "Job not found" });
     const loggedin = req.loggedin;
-    const comments = '';
+    const userId = req.userId;
+
+    const job = await jobRepo.findOneJob({slug});
+    if (!job) return resp(404, { message: "Trabajo no encontrado" });
+
     if (loggedin) {
-        const loginUser = await authRepo.findById(req.userId);
-
-        const comments = await Promise.all(job.comments.map(async commentId => {
-            const commentObj = await Comment.findById(commentId);
-            return await commentObj.toCommentResponse(loginUser);
-        }))
-
-        return resp(200, { comments });
+        const loginUser = await authRepo.findById(userId);
+        res = {
+            comments: (await Promise.all(job.comments.map(async commentId => {
+                const commentObj = await commentRepo.findById(commentId);
+                return await commentObj.toCommentResponse(loginUser);
+            })))
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Ordenar por fecha descendente
+        };
     } else {
-        comments = await Promise.all(job.comments.map(async (commentId) => {
-            const commentObj = await Comment.findById(commentId).exec();
-            const temp = await commentObj.toCommentResponse(false);
-            return temp;
-        }))
-
-        return resp(200, { comments });
+        res = {
+            comments: (await Promise.all(job.comments.map(async commentId => {
+                const commentObj = await commentRepo.findById(commentId);
+                return await commentObj.toCommentResponse(false);
+            })))
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Ordenar por fecha descendente
+        };
     }
-}
+
+    return resp(200, res);
+};
 
 const deleteComment = async (req) => {
     const userId = req.userId;
@@ -75,8 +79,6 @@ const deleteComment = async (req) => {
     }
 
 }
-
-
 
 module.exports = {
     addCommentsToJob,
