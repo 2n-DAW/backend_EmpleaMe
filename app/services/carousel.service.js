@@ -25,7 +25,8 @@ const getCarouselJob = async (params) => {
         return resp(404, { message: "Trabajo no encontrado" });
     }
 
-    return resp(200, { job: job.toJobCarouselResponse() });
+    const res = await job.toJobCarouselResponse();
+    return resp(200, { job: res });
 };
 
 module.exports = {

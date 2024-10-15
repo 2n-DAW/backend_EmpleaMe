@@ -44,8 +44,7 @@ const AuthSchema = mongoose.Schema({
 
 AuthSchema.plugin(uniqueValidator, { msg: "already taken" });
 
-// @desc generate access token for a user
-// @required valid email and password
+
 AuthSchema.methods.generateAccessToken = function() {
     const accessToken = jwt.sign({
             "user": {

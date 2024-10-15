@@ -1,29 +1,18 @@
 const jobService = require("../services/job.service.js");
-
-// EXPRESS-ASYNC-HANDLER captura los errores generados en operaciones asíncronas y los pasa al midleware de express
-// no es necesario utilizar los try ... catch
 const asyncHandler = require('express-async-handler');
-
 
 const createJob = asyncHandler(async (req, res) => {
     const { status, result } = await jobService.createJob(req);
     return res.status(status).json(result);
 });
 
-// FIND ONE JOB
+
 const findOneJob = asyncHandler(async (req, res) => {
-    const { status, result } = await jobService.findOneJob(req.params);
+    const { status, result } = await jobService.findOneJob(req);
     return res.status(status).json(result);
 });
 
-// // FEED ALL JOBS
-// const feedAllJobs = asyncHandler(async (req, res) => {
-//     const { jobs, job_count } = await jobService.feedAllJobs(req, req.query);
 
-//     return res.status(200).json({ jobs, job_count });
-// });
-
-// FIND ALL JOBS
 const findAllJobs = asyncHandler(async (req, res) => {
     const { status, result } = await jobService.findAllJobs(req);
     return res.status(status).json(result);
@@ -35,17 +24,27 @@ const getJobsByCategory = asyncHandler(async (req, res) => {
     return res.status(status).json(result);
 });
 
-// UPDATE
+
 const updateJob = asyncHandler(async (req, res) => {
     const { status, result } = await jobService.updateJob(req);
     return res.status(status).json(result);
-})
+});
 
 
 const deleteOneJob = asyncHandler(async (req, res) => {
-    const result = await jobService.deleteOneJob(req);
-    return res.status(200).json(result);
-})
+    const { status, result } = await jobService.deleteOneJob(req);
+    return res.status(status).json(result);
+});
+
+const favoriteJob = asyncHandler(async (req, res) => {
+    const { status, result } = await jobService.favoriteJob(req);
+    return res.status(status).json(result);
+});
+
+const unfavoriteJob = asyncHandler(async (req, res) => {
+    const { status, result } = await jobService.unfavoriteJob(req);
+    return res.status(status).json(result);
+});
 
 
 module.exports = {
@@ -54,5 +53,7 @@ module.exports = {
     findAllJobs,
     updateJob,
     getJobsByCategory,
-    deleteOneJob
+    deleteOneJob,
+    favoriteJob,
+    unfavoriteJob
 }

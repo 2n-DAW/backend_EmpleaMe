@@ -9,7 +9,10 @@ const verifyJWT = async (req, res, next) => {
     }
 
     const accessToken  = authHeader.split(' ')[1];
-    
+    console.log(accessToken);
+
+    req.accessToken = accessToken;
+
     jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, async (err, decodedAccess) => {
         if (err) {
             // Si el accessToken ha expirado, busca el refreshToken asociado

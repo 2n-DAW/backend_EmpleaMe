@@ -1,23 +1,34 @@
-// REPOSITORIES: operaciones con la base de datos
 const authModel = require('../models/auth.model.js');
 
-// GET PROFILE
-const getProfile  = async (data) => {
+
+const getProfile = async (data) => {
     return await authModel.findOne(data);
 };
 
-// FOLLOW A USER
+
 const followUser = async (loginUser, user_id) => {
     loginUser.follow(user_id);
 };
 
-// UNFOLLOW A USER
+
 const unFollowUser = async (loginUser, user_id) => {
     loginUser.unfollow(user_id);
 };
 
+const getUserFollowers = async (user, query) => {
+    const { offset, limit } = query;
+    return await authModel.find({ followingUsers: user._id }, {}, { skip: Number(offset), limit: Number(limit) });
+};
+
+const getUserFollowing = async (user, query) => {
+    const { offset, limit } = query;
+    return await authModel.find({ _id: { $in: user.followingUsers } }, {}, { skip: Number(offset), limit: Number(limit) });
+};
+
 module.exports = {
-    getProfile ,
+    getProfile,
     followUser,
-    unFollowUser
+    unFollowUser,
+    getUserFollowers,
+    getUserFollowing
 }
