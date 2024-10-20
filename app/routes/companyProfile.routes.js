@@ -1,6 +1,7 @@
 const verifyJWT = require('../middleware/verifyJWT.js');
 const verifyJWTOptional = require('../middleware/verifyJWTOptional.js');
 const verifyUserJWT = require('../middleware/verifyUserJWT.js');
+
 module.exports = (app) => {
     const { getProfile, followUser, unFollowUser, getUserJobs, getUserLikes, getUserFollowers, getUserFollowing } = require('../controllers/companyProfile.controller.js');
 

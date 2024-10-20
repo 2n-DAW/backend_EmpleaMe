@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 const uniqueValidator = require('mongoose-unique-validator');
-const Auth = require("./auth.model");
+const userModel = require("./user.model");
+const authRepo = require('../repositories/auth.repo.js');
 
 const JobSchema = mongoose.Schema({
     slug: {
@@ -15,7 +16,7 @@ const JobSchema = mongoose.Schema({
     },
     author: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Auth'
+        ref: 'User'
     },
     description: {
         type: String,
@@ -73,18 +74,8 @@ JobSchema.methods.slugify = async function () {
     this.slug = slugify(this.name) + '-' + (Math.random() * Math.pow(36, 10) | 0).toString(36);
 };
 
-JobSchema.methods.updateFavoriteCount = async function () {
-    const favoriteCount = await Auth.count({
-        favouriteJobs: {$in: [this._id]}
-    });
-
-    this.favouritesCount = favoriteCount;
-
-    return this.save();
-}
-
 JobSchema.methods.toJobResponse = async function (user) {
-    const authorObj = await Auth.findById(this.author);
+    const authorObj = await authRepo.findOne({ userId: this.author });
     return {
         slug: this.slug,
         name: this.name,
@@ -111,7 +102,7 @@ JobSchema.methods.toJobCarouselResponse = async function () {
 }
 
 JobSchema.methods.updateFavoriteCount = async function () {
-    const favoriteCount = await Auth.count({
+    const favoriteCount = await userModel.count({
         favouriteJobs: { $in: [this._id] }
     });
     this.favouritesCount = favoriteCount;

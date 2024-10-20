@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Auth = require('./auth.model');
+const authRepo = require('../repositories/auth.repo.js');
 
 const commentSchema = new mongoose.Schema({
     body: {
@@ -8,7 +8,7 @@ const commentSchema = new mongoose.Schema({
     },
     author: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Auth'
+        ref: 'User'
     },
     job: {
         type: mongoose.Schema.Types.ObjectId,
@@ -21,7 +21,7 @@ const commentSchema = new mongoose.Schema({
 
 
 commentSchema.methods.toCommentResponse = async function (user) {
-    const authorObj = await Auth.findById(this.author);
+    const authorObj = await authRepo.findOne({ userId: this.author });
     return {
         id: this._id,
         body: this.body,

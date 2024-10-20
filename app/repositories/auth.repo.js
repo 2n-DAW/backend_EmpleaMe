@@ -1,45 +1,58 @@
-const authModel = require('../models/auth.model.js');
+const userModel = require('../models/user.model.js');
+const clientUserModel = require('../models/clientUser.model.js');
 const tokenModel = require('../models/token.model.js');
 const blacklistModel = require('../models/blacklist.model.js');
 const bcrypt = require('bcrypt');
 
-// LOGIN
-const userLogin = async (emailObject) => {
-    return await authModel.findOne(emailObject);
+// USER TYPE
+const userType = async (emailObject) => {
+    return await userModel.findOne(emailObject);
 };
 
-// REGISTER
+// LOGIN
+const clientUserLogin = async (emailObject) => {
+    return await clientUserModel.findOne(emailObject);
+};
+
+// REGISTER USER
 const registerUser = async (user) => {
-    return await authModel.create(user);
+    return await userModel.create(user);
+};
+
+// REGISTER CLIENT USER
+const registerClientUser = async (clientUser) => {
+    return await clientUserModel.create(clientUser);
 };
 
 // GET CURRENT USER
-const getCurrentUser = async (emailObject) => {
-    return await authModel.findOne(emailObject);
+const getCurrentUser = async (idObject) => {
+    return await clientUserModel.findOne(idObject);
 };
 
-// UPDATE
-const updateUser = async (emailObject, user) => {
-    const updatedUser = await authModel.findOne(emailObject);
+// UPDATE USER
+const updateUser = async (idObject, user) => {
+    const updatedUser = await userModel.findById(idObject);
     
     if (updatedUser) {
-        if (user.email) {
-            updatedUser.email = user.email;
-        }
-        if (user.username) {
-            updatedUser.username = user.username;
-        }
-        if (user.password) {
-            const hashedPwd = await bcrypt.hash(user.password, 10);
-            updatedUser.password = hashedPwd;
-        }
-        if (typeof user.image !== 'undefined') {
-            updatedUser.image = user.image;
-        }
-        if (typeof user.bio !== 'undefined') {
-            updatedUser.bio = user.bio;
-        }
+        if (user.username) updatedUser.username = user.username;
+        if (user.email) updatedUser.email = user.email;
+        if (user.password) updatedUser.password = await bcrypt.hash(user.password, 10);
         return await updatedUser.save();
+    }
+
+    return null;
+};
+
+// UPDATE USER CLIENT
+const updateClientUser = async (idObject, user) => {
+    const updatedClientUser = await clientUserModel.findOne(idObject);
+    
+    if (updatedClientUser) {
+        if (user.username) updatedClientUser.username = user.username;
+        if (user.email) updatedClientUser.email = user.email;
+        if (typeof user.bio !== 'undefined') updatedClientUser.bio = user.bio;
+        if (typeof user.image !== 'undefined') updatedClientUser.image = user.image;
+        return await updatedClientUser.save();
     }
 
     return null;
@@ -47,8 +60,12 @@ const updateUser = async (emailObject, user) => {
 
 // FIND BY ID
 const findById = async (id) => {
-    const res = await authModel.findById(id);
-    return res;
+    return await userModel.findById(id);
+};
+
+// FIND ONE
+const findOne = async (data) => {
+    return await clientUserModel.findOne(data);
 };
 
 // SAVE TOKEN
@@ -108,11 +125,15 @@ const unfavorite = async (user, jobId) => {
 
 
 module.exports = {
-    userLogin,
+    userType,
+    clientUserLogin,
     registerUser,
+    registerClientUser,
     getCurrentUser,
     updateUser,
+    updateClientUser,
     findById,
+    findOne,
     saveToken,
     findOneToken,
     isBlacklisted,

@@ -1,8 +1,13 @@
 const authService = require("../services/auth.service.js");
 const asyncHandler = require('express-async-handler');
 
-const userLogin = asyncHandler(async (req, res) => {
-    const { status, result } = await authService.userLogin(req.body);
+const userType = asyncHandler(async (req, res) => {
+    const { status, result } = await authService.userType(req.body);
+    return res.status(status).json(result);
+});
+
+const clientUserLogin = asyncHandler(async (req, res) => {
+    const { status, result } = await authService.clientUserLogin(req.body);
     return res.status(status).json(result);
 });
 
@@ -32,7 +37,8 @@ const logout = asyncHandler(async (req, res) => {
 
 
 module.exports = {
-    userLogin,
+    userType,
+    clientUserLogin,
     registerUser,
     getCurrentUser,
     updateUser,
