@@ -6,13 +6,8 @@ const dotenv = require("dotenv");
 const app = express();
 dotenv.config();
 
-console.log(process.env.ACCESS_TOKEN_SECRET);
-
 const PORT = process.env.PORT || 3000;
 const CORSURL = process.env.CORSURL || "http://localhost:4200";
-
-
-
 
 // Habilita CORS para todas las rutas
 const corsOptions = {
@@ -21,7 +16,6 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -39,9 +33,9 @@ mongoose.Promise = global.Promise;
 mongoose.connect(dbConfig.url, {
     useNewUrlParser: true
 }).then(() => {
-    console.log("Successfully connected to the database");
+    console.log("Conectado exitosamente a la base de datos");
 }).catch(err => {
-    console.log('Could not connect to the database. Exiting now...', err);
+    console.log('No se pudo conectar a la base de datos. Saliendo ...', err);
     process.exit();
 });
 

@@ -28,7 +28,7 @@ const verifyJWTOptional = (req, res, next) => {
             req.loggedin = true;
             req.userId = decoded.user.id;
             req.userEmail = decoded.user.email;
-            req.userHashedPwd = decoded.user.password;
+            req.userType = decoded.user.userType;
             next();
         }
     )

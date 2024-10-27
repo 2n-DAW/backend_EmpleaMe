@@ -9,7 +9,6 @@ const verifyJWT = async (req, res, next) => {
     }
 
     const accessToken  = authHeader.split(' ')[1];
-    console.log(accessToken);
 
     req.accessToken = accessToken;
 
@@ -40,7 +39,8 @@ const verifyJWT = async (req, res, next) => {
                     "id": decodedRefresh.user.id,
                     "username": decodedRefresh.user.username,
                     "email": decodedRefresh.user.email,
-                    "password": decodedRefresh.user.password
+                    "userType": decodedRefresh.user.userType
+                    // "password": decodedRefresh.user.password
                     }
                 },
                 process.env.ACCESS_TOKEN_SECRET,
@@ -50,14 +50,16 @@ const verifyJWT = async (req, res, next) => {
                 // Guarda el nuevo accessToken en BD junto su correspondiente refreshToken
                 await authRepo.saveToken(refreshToken, newAccessToken, decodedRefresh.user.id);
 
+                req.userId = decodedRefresh.user.id;
                 req.userEmail = decodedRefresh.user.email;
+                req.userType = decodedRefresh.user.userType;
                 req.token = newAccessToken;
                 next();
             });
         } else {
             req.userId = decodedAccess.user.id;
             req.userEmail = decodedAccess.user.email;
-            req.userHashedPwd = decodedAccess.user.password;
+            req.userType = decodedAccess.user.userType;
             req.token = accessToken;
             next();
         }

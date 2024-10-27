@@ -3,31 +3,46 @@ const repoJob = require('../repositories/job.repo.js');
 const { resp } = require("../utils/utils.js");
 const bcrypt = require('bcrypt');
 
-// LOGIN
-const userLogin = async (data) => {
+// USER TYPE
+const userType = async (data) => {
     const { user } = data;
-
 
     // confirm data
     if (!user || !user.email || !user.password) {
         return resp(400, { message: "Todos los campos son necesarios" });
     }
 
-    const loginUser = await authRepo.userLogin({ email: user.email });
+    const loginUser = await authRepo.userType({ email: user.email });
 
     if (!loginUser) return resp(404, { message: "Usuario no encontrado" });
+    if (loginUser.isActive === false) return resp(401, { message: "Usuario desactivado" });
 
     const match = await bcrypt.compare(user.password, loginUser.password);
-
     if (!match) return resp(401, { message: "Contraseña inválida" });
+
+    const res = loginUser.toUserResponse();
+    return resp(200, { user: res });
+};
+
+// LOGIN
+const clientUserLogin = async (data) => {
+    const { user } = data;
+
+    // confirm data
+    if (!user || !user.email || !user.userType) {
+        return resp(404, { message: "Usuario no encontrado" });
+    }
+
+    const loginUser = await authRepo.clientUserLogin({ email: user.email });
+    if (!loginUser) return resp(404, { message: "Usuario no encontrado" });
 
     const accessToken = await loginUser.generateAccessToken();
     const refreshToken = await loginUser.generateRefreshToken();
 
     // Guarda el refreshToken en la base de datos junto el idUser
-    await authRepo.saveToken(refreshToken, accessToken, loginUser._id);
+    await authRepo.saveToken(refreshToken, accessToken, loginUser.userId);
 
-    const res = loginUser.toAuthResponse(accessToken);
+    const res = loginUser.toClientUserResponse(accessToken);
     return resp(200, { user: res });
 };
 
@@ -45,14 +60,21 @@ const registerUser = async (data) => {
 
     const userObject = {
         "username": user.username,
-        "password": hashedPwd,
-        "email": user.email
+        "email": user.email,
+        "password": hashedPwd
     };
-
     const newUser = await authRepo.registerUser(userObject);
+    if (!newUser) return resp(400, { message: "Registro de usuario fallido" });
 
-    if (newUser) {
-        return resp(201, { user: newUser.toAuthResponse() });
+    const clientUserObject = {
+        "userId": newUser._id,
+        "username": user.username,
+        "email": user.email,
+    };
+    const newClientUser = await authRepo.registerClientUser(clientUserObject);
+
+    if (newClientUser) {
+        return resp(201, { message: "Registro de usuario terminado" });
     } else {
         return resp(400, { message: "Registro de usuario fallido" });
     }
@@ -60,14 +82,14 @@ const registerUser = async (data) => {
 
 // GET CURRENT USER
 const getCurrentUser = async (req) => {
-    const email = req.userEmail;
+    const userId = req.userId;
     const accessToken = req.token;
 
-    const user = await authRepo.getCurrentUser({ email });
+    const user = await authRepo.getCurrentUser({ userId });
 
     if (!user) return { status: 404, result: { message: "Usuario no encontrado" } };
 
-    return resp(200, { currentUser: user.toAuthResponse(accessToken) });
+    return resp(200, { currentUser: user.toClientUserResponse(accessToken) });
 };
 
 // UPDATE
@@ -75,15 +97,22 @@ const updateUser = async (req) => {
     const { user } = req.body;
 
     // confirm data
-    if (!user) return resp(400, { message: "Usuario necesario" });
+    if (!user) return resp(400, { message: "Datos a actualizar necesarios" });
 
     const email = req.userEmail;
+    const userId = req.userId;
 
-    const updatedUser = await authRepo.updateUser({ email }, user);
+    if (user.username || user.email || user.password) {
+        const updatedUser = await authRepo.updateUser(userId, user);
+        if (!updatedUser) return resp(404, { message: "Usuario no encontrado" });
+    }
 
-    if (!updatedUser) return resp(404, { message: "Usuario no encontrado" });
+    if (user.username || user.email || user.bio || user.image) {
+        updatedClientUser = await authRepo.updateClientUser({ userId }, user);
+        if (!updatedClientUser) return resp(404, { message: "Usuario no encontrado" });
+    }
 
-    return resp(200, { user: updatedUser.toAuthResponse() });
+    return resp(200, { user: updatedClientUser.toClientUserResponse() });
 };
 
 // LOGOUT
@@ -100,7 +129,8 @@ const logout = async (accessToken) => {
 
 
 module.exports = {
-    userLogin,
+    userType,
+    clientUserLogin,
     registerUser,
     getCurrentUser,
     updateUser,

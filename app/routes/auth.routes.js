@@ -1,9 +1,11 @@
 const verifyJWT = require('../middleware/verifyJWT.js');
 
 module.exports = (app) => {
-    const { userLogin, registerUser, getCurrentUser, updateUser, logout } = require('../controllers/auth.controller.js');
+    const { userType, clientUserLogin, registerUser, getCurrentUser, updateUser, logout } = require('../controllers/auth.controller.js');
 
-    app.post('/users/login', userLogin);
+    app.post('/users/userType', userType);
+    
+    app.post('/users/login', clientUserLogin);
 
     app.post('/users/register', registerUser);
 

@@ -13,7 +13,6 @@ const createJob = async (req) => {
     const category = await categoryRepo.findOneCategory({ id_cat });
     if (!category) return resp(404, { message: "Categoria no encontrada" });
 
-
     const job_data = {
         name: name || null,
         description: description || null,
