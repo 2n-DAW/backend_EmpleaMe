@@ -127,6 +127,13 @@ const logout = async (accessToken) => {
     return resp(200, { message: 'Deslogeado correctamente' });
 };
 
+const userDelete = async (username) => {
+    const user = await authRepo.userDelete(username);
+    if (!user) return resp(404, { message: "Usuario no encontrado" });
+
+    return resp(200, { message: "Usuario eliminado" });
+};
+
 
 module.exports = {
     userType,
@@ -135,5 +142,5 @@ module.exports = {
     getCurrentUser,
     updateUser,
     logout,
-
+    userDelete
 }

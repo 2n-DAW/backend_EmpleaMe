@@ -35,6 +35,11 @@ const logout = asyncHandler(async (req, res) => {
     return res.status(status).json(result);
 });
 
+const userDelete = asyncHandler(async (req, res) => {
+    const { status, result } = await authService.userDelete(req.params.username);
+    return res.status(status).json(result);
+});
+
 
 module.exports = {
     userType,
@@ -43,4 +48,5 @@ module.exports = {
     getCurrentUser,
     updateUser,
     logout,
+    userDelete
 }

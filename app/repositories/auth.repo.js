@@ -123,6 +123,10 @@ const unfavorite = async (user, jobId) => {
     return await user.unfavorite(jobId);
 };
 
+const userDelete = async (username) => {
+    return await userModel.findOneAndDelete({ username });
+};
+
 
 module.exports = {
     userType,
@@ -140,5 +144,6 @@ module.exports = {
     createBlacklistToken,
     deleteOneRefresh,
     favorite,
-    unfavorite
+    unfavorite,
+    userDelete
 }

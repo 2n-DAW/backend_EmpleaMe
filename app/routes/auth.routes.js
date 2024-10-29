@@ -1,7 +1,7 @@
 const verifyJWT = require('../middleware/verifyJWT.js');
 
 module.exports = (app) => {
-    const { userType, clientUserLogin, registerUser, getCurrentUser, updateUser, logout } = require('../controllers/auth.controller.js');
+    const { userType, clientUserLogin, registerUser, getCurrentUser, updateUser, logout, userDelete } = require('../controllers/auth.controller.js');
 
     app.post('/user/type', userType);
     
@@ -14,5 +14,7 @@ module.exports = (app) => {
     app.put('/user', verifyJWT, updateUser);
 
     app.get('/user/logout', verifyJWT, logout);
+
+    app.delete('/user/:username', userDelete); //Compensación para el fallo del patron saga en el register
 
 }
