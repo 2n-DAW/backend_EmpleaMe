@@ -50,6 +50,8 @@ const clientUserLogin = async (data) => {
 const registerUser = async (data) => {
     const { user } = data;
 
+    console.log(user);
+
     // confirm data
     if (!user || !user.email || !user.username || !user.password) {
         return resp(400, { message: "Todos los campos son necesarios" });
@@ -64,20 +66,9 @@ const registerUser = async (data) => {
         "password": hashedPwd
     };
     const newUser = await authRepo.registerUser(userObject);
-    if (!newUser) return resp(400, { message: "Registro de usuario fallido" });
+    if (!newUser) return resp(500, { message: "Registro de usuario fallido" });
 
-    const clientUserObject = {
-        "userId": newUser._id,
-        "username": user.username,
-        "email": user.email,
-    };
-    const newClientUser = await authRepo.registerClientUser(clientUserObject);
-
-    if (newClientUser) {
-        return resp(201, { message: "Registro de usuario terminado" });
-    } else {
-        return resp(400, { message: "Registro de usuario fallido" });
-    }
+    return resp(201, { message: "Registro de usuario terminado" });
 };
 
 // GET CURRENT USER
@@ -134,6 +125,32 @@ const userDelete = async (username) => {
     return resp(200, { message: "Usuario eliminado" });
 };
 
+const registerUserClient = async (data) => {
+    const { user } = data;
+
+    // confirm data
+    if (!user || !user.email || !user.username || !user.password) {
+        return resp(400, { message: "Todos los campos son necesarios" });
+    }
+
+    // hash password
+    const hashedPwd = await bcrypt.hash(user.password, 10);
+
+    const userObject = {
+        "username": user.username,
+        "email": user.email,
+        "password": hashedPwd
+    };
+
+    const newClientUser = await authRepo.registerClientUser(userObject);
+
+    if (newClientUser) {
+        return resp(201, { message: "Registro de usuario terminado" });
+    } else {
+        return resp(409, { message: "Registro de usuario fallido" });
+    }
+};
+
 
 module.exports = {
     userType,
@@ -142,5 +159,6 @@ module.exports = {
     getCurrentUser,
     updateUser,
     logout,
-    userDelete
+    userDelete,
+    registerUserClient
 }

@@ -21,6 +21,7 @@ const registerUser = async (user) => {
 
 // REGISTER CLIENT USER
 const registerClientUser = async (clientUser) => {
+    console.log("sdfasdfsdafsadf", clientUser);
     return await clientUserModel.create(clientUser);
 };
 
