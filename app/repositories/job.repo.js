@@ -8,16 +8,12 @@ const createJob = async (data) => {
     return await job.save(); //guardamos el objeto en la base de datos
 };
 
-
 const findOneJob = async (params) => {
     const res = await jobModel.findOne(params);
     return res;
 };
 
-
-
 const findAllJobs = async (params) => {
-
     let { limit, offset, category, contract, workingDay, province, name, salary_min, salary_max, author } = params;
     const name_regex = new RegExp(name);
 
@@ -54,11 +50,9 @@ const findAllJobs = async (params) => {
     return { jobs, job_count };
 };
 
-
 const getJobsByCategory = async (jobId) => {
     return await jobModel.findById(jobId);
 };
-
 
 const updateJob = async (params, updateData) => {
     const job = await jobModel.findOne(params); //buscamos el objeto en la base de datos
@@ -76,7 +70,6 @@ const updateJob = async (params, updateData) => {
 
     return null;
 };
-
 
 const deleteOneJob = async (params) => {
     return await jobModel.deleteOne(params);

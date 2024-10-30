@@ -2,7 +2,6 @@ const commentRepo = require("../repositories/comment.repo.js");
 const authRepo = require("../repositories/auth.repo.js");
 const jobRepo = require("../repositories/job.repo.js");
 const { resp } = require("../utils/utils.js");
-const Comment = require("../models/comment.model.js");
 
 const addCommentsToJob = async (req) => {
     const id = req.userId;
@@ -61,19 +60,20 @@ const getCommentsFromJob = async (req) => {
 
 const deleteComment = async (req) => {
     const userId = req.userId;
+
     const commenter = await authRepo.findById(userId);
     if (!commenter) return resp(404, { message: "User not found" });
+
     const { slug, id } = req.params;
+
     const job = await jobRepo.findOneJob({ slug });
     if (!job) return resp(404, { message: "Job not found" });
-    console.log('---------------------------------', id);
+    
     const comment = await commentRepo.findById(id);
-    console.log(comment);
     if (comment.author.toString() === commenter._id.toString()) {
         await jobRepo.removeComment(job, comment._id);
         await commentRepo.deleteOne(comment._id);
         return resp(200, { message: "comment has been deleted" });
-
     } else {
         return resp(403, { error: "only the author of the comment can delete the comment" });
     }
@@ -84,5 +84,4 @@ module.exports = {
     addCommentsToJob,
     getCommentsFromJob,
     deleteComment
-
 }
