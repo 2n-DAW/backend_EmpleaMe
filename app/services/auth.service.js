@@ -48,9 +48,9 @@ const clientUserLogin = async (data) => {
 
 // REGISTER
 const registerUser = async (data) => {
-    const { user } = data;
+    const { user, userType } = data;
 
-    console.log(user);
+    console.log('data', data);
 
     // confirm data
     if (!user || !user.email || !user.username || !user.password) {
@@ -63,7 +63,8 @@ const registerUser = async (data) => {
     const userObject = {
         "username": user.username,
         "email": user.email,
-        "password": hashedPwd
+        "password": hashedPwd,
+        "userType": userType
     };
     const newUser = await authRepo.registerUser(userObject);
     if (!newUser) return resp(500, { message: "Registro de usuario fallido" });
