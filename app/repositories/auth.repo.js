@@ -21,6 +21,7 @@ const registerUser = async (user) => {
 
 // REGISTER CLIENT USER
 const registerClientUser = async (clientUser) => {
+    console.log("sdfasdfsdafsadf", clientUser);
     return await clientUserModel.create(clientUser);
 };
 
@@ -123,6 +124,10 @@ const unfavorite = async (user, jobId) => {
     return await user.unfavorite(jobId);
 };
 
+const userDelete = async (username) => {
+    return await userModel.findOneAndDelete({ username });
+};
+
 
 module.exports = {
     userType,
@@ -140,5 +145,6 @@ module.exports = {
     createBlacklistToken,
     deleteOneRefresh,
     favorite,
-    unfavorite
+    unfavorite,
+    userDelete
 }

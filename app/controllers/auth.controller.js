@@ -13,6 +13,7 @@ const clientUserLogin = asyncHandler(async (req, res) => {
 
 
 const registerUser = asyncHandler(async (req, res) => {
+    console.log(req.body);
     const { status, result } = await authService.registerUser(req.body);
     return res.status(status).json(result);
 });
@@ -35,6 +36,16 @@ const logout = asyncHandler(async (req, res) => {
     return res.status(status).json(result);
 });
 
+const userDelete = asyncHandler(async (req, res) => {
+    const { status, result } = await authService.userDelete(req.params.username);
+    return res.status(status).json(result);
+});
+
+const registerUserClient = asyncHandler(async (req, res) => {
+    const { status, result } = await authService.registerUserClient(req.body);
+    return res.status(status).json(result);
+});
+
 
 module.exports = {
     userType,
@@ -43,4 +54,6 @@ module.exports = {
     getCurrentUser,
     updateUser,
     logout,
+    userDelete,
+    registerUserClient
 }
