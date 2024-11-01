@@ -23,6 +23,8 @@ const InscriptionSchema = mongoose.Schema({
         timestamps: true
     });
 
+InscriptionSchema.index({ job: 1, user_email: 1 }, { unique: true });
+
 InscriptionSchema.plugin(uniqueValidator, { msg: "already taken" });
 
 InscriptionSchema.methods.toInscriptionResponse = function () {
