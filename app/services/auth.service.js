@@ -69,7 +69,7 @@ const registerUser = async (data) => {
     const newUser = await authRepo.registerUser(userObject);
     if (!newUser) return resp(500, { message: "Registro de usuario fallido" });
 
-    return resp(201, { message: "Registro de usuario terminado" });
+    return resp(201, { user: newUser });
 };
 
 // GET CURRENT USER
@@ -130,7 +130,7 @@ const registerUserClient = async (data) => {
     const { user } = data;
 
     // confirm data
-    if (!user || !user.email || !user.username || !user.password) {
+    if (!user || !user.email || !user.username || !user.password || !user.userId) {
         return resp(400, { message: "Todos los campos son necesarios" });
     }
 
@@ -138,6 +138,7 @@ const registerUserClient = async (data) => {
     const hashedPwd = await bcrypt.hash(user.password, 10);
 
     const userObject = {
+        "userId": user.userId,
         "username": user.username,
         "email": user.email,
         "password": hashedPwd
@@ -146,7 +147,7 @@ const registerUserClient = async (data) => {
     const newClientUser = await authRepo.registerClientUser(userObject);
 
     if (newClientUser) {
-        return resp(201, { message: "Registro de usuario terminado" });
+        return resp(201, { user: newClientUser });
     } else {
         return resp(409, { message: "Registro de usuario fallido" });
     }
