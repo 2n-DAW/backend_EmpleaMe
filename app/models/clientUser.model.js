@@ -3,6 +3,11 @@ const uniqueValidator = require('mongoose-unique-validator');
 const jwt = require("jsonwebtoken");
 
 const ClientUserSchema = mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    },
 
     username: {
         type: String,
