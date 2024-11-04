@@ -40,15 +40,21 @@ const findOneJob = async (req) => {
 
     if (!job) return resp(404, { message: "Trabajo no encontrado" });
 
+    let res = {};
     if (req.loggedin) {
         const loginUser = await authRepo.findById(req.userId);
-        res = { job: await job.toJobResponse(loginUser) };
+        const userInscriptions = await inscriptionRepo.findUserInscriptions(req.userEmail);
+
+        const inscription = userInscriptions.find(inscription => inscription.job === job.slug);
+
+        res = { job: await job.toJobResponse(loginUser, inscription ? inscription.status : 0) };
     } else {
-        res = { job: await job.toJobResponse(false) };
+        res = { job: await job.toJobResponse(false, 0) };
     }
 
     return resp(200, res);
 };
+
 
 
 const findAllJobs = async (req) => {
@@ -60,14 +66,11 @@ const findAllJobs = async (req) => {
     let res = {};
     if (req.loggedin) {
         const loginUser = await authRepo.findById(req.userId);
-        console.log(req.userEmail);
         const userInscriptions = await inscriptionRepo.findUserInscriptions(req.userEmail);
-        console.log(userInscriptions);
 
         res = {
             jobs: await Promise.all(jobs.map(async job => {
                 const inscription = userInscriptions.find(inscription => inscription.job === job.slug);
-                console.log(inscription);
                 return await job.toJobResponse(loginUser, inscription ? inscription.status : 0);
             })),
             job_count
