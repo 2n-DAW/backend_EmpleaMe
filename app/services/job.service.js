@@ -2,6 +2,7 @@ const jobRepo = require('../repositories/job.repo.js');
 const categoryRepo = require('../repositories/category.repo.js');
 const authRepo = require('../repositories/auth.repo.js');
 const { resp } = require('../utils/utils.js');
+const inscriptionRepo = require('../repositories/inscription.repo.js');
 
 
 const createJob = async (req) => {
@@ -55,25 +56,36 @@ const findAllJobs = async (req) => {
 
     if (!jobs) return resp(404, { message: "No se encontraron trabajos" });
 
+
+    let res = {};
     if (req.loggedin) {
         const loginUser = await authRepo.findById(req.userId);
+        console.log(req.userEmail);
+        const userInscriptions = await inscriptionRepo.findUserInscriptions(req.userEmail);
+        console.log(userInscriptions);
+
         res = {
             jobs: await Promise.all(jobs.map(async job => {
-                return await job.toJobResponse(loginUser);
+                const inscription = userInscriptions.find(inscription => inscription.job === job.slug);
+                console.log(inscription);
+                return await job.toJobResponse(loginUser, inscription ? inscription.status : 0);
             })),
             job_count
         };
+
+        return resp(200, res);
     } else {
         res = {
             jobs: await Promise.all(jobs.map(async job => {
-                return await job.toJobResponse(false);
+                return await job.toJobResponse(false, 0);
             })),
             job_count
         };
-    }
 
-    return resp(200, res);
+        return resp(200, res);
+    }
 };
+
 
 
 const getJobsByCategory = async (params) => {

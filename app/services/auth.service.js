@@ -27,13 +27,14 @@ const userType = async (data) => {
 // LOGIN
 const clientUserLogin = async (data) => {
     const { user } = data;
-
+    console.log('data', data);
     // confirm data
-    if (!user || !user.email || !user.userType) {
+    if (!user || !user.email) {
         return resp(404, { message: "Usuario no encontrado" });
     }
-
+    console.log(user.email);
     const loginUser = await authRepo.clientUserLogin({ email: user.email });
+    console.log('loginUser', loginUser);
     if (!loginUser) return resp(404, { message: "Usuario no encontrado" });
 
     const accessToken = await loginUser.generateAccessToken();
