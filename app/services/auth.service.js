@@ -29,7 +29,7 @@ const clientUserLogin = async (data) => {
     const { user } = data;
 
     // confirm data
-    if (!user || !user.email || !user.userType) {
+    if (!user || !user.email || !user.password) {
         return resp(404, { message: "Usuario no encontrado" });
     }
 
@@ -81,7 +81,7 @@ const getCurrentUser = async (req) => {
 
     if (!user) return { status: 404, result: { message: "Usuario no encontrado" } };
 
-    return resp(200, { currentUser: user.toClientUserResponse(accessToken) });
+    return resp(200, { user: user.toClientUserResponse(accessToken), type: "client" });
 };
 
 // UPDATE

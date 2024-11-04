@@ -9,7 +9,7 @@ const createInscription = async (data) => {
         user_email,
         job,
         status: 1,
-        date: new Date()
+        // date: new Date()
     };
     const res = await inscriptionRepo.createInscription(inscription_data);
 
