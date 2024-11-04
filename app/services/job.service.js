@@ -2,6 +2,7 @@ const jobRepo = require('../repositories/job.repo.js');
 const categoryRepo = require('../repositories/category.repo.js');
 const authRepo = require('../repositories/auth.repo.js');
 const { resp } = require('../utils/utils.js');
+const inscriptionRepo = require('../repositories/inscription.repo.js');
 
 
 const createJob = async (req) => {
@@ -39,15 +40,21 @@ const findOneJob = async (req) => {
 
     if (!job) return resp(404, { message: "Trabajo no encontrado" });
 
+    let res = {};
     if (req.loggedin) {
         const loginUser = await authRepo.findById(req.userId);
-        res = { job: await job.toJobResponse(loginUser) };
+        const userInscriptions = await inscriptionRepo.findUserInscriptions(req.userEmail);
+
+        const inscription = userInscriptions.find(inscription => inscription.job === job.slug);
+
+        res = { job: await job.toJobResponse(loginUser, inscription ? inscription.status : 0) };
     } else {
-        res = { job: await job.toJobResponse(false) };
+        res = { job: await job.toJobResponse(false, 0) };
     }
 
     return resp(200, res);
 };
+
 
 
 const findAllJobs = async (req) => {
@@ -55,25 +62,33 @@ const findAllJobs = async (req) => {
 
     if (!jobs) return resp(404, { message: "No se encontraron trabajos" });
 
+
+    let res = {};
     if (req.loggedin) {
         const loginUser = await authRepo.findById(req.userId);
+        const userInscriptions = await inscriptionRepo.findUserInscriptions(req.userEmail);
+
         res = {
             jobs: await Promise.all(jobs.map(async job => {
-                return await job.toJobResponse(loginUser);
+                const inscription = userInscriptions.find(inscription => inscription.job === job.slug);
+                return await job.toJobResponse(loginUser, inscription ? inscription.status : 0);
             })),
             job_count
         };
+
+        return resp(200, res);
     } else {
         res = {
             jobs: await Promise.all(jobs.map(async job => {
-                return await job.toJobResponse(false);
+                return await job.toJobResponse(false, 0);
             })),
             job_count
         };
-    }
 
-    return resp(200, res);
+        return resp(200, res);
+    }
 };
+
 
 
 const getJobsByCategory = async (params) => {
