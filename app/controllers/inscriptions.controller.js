@@ -6,6 +6,12 @@ const createInscription = expressAsyncHandler(async (req, res) => {
     return res.status(status).json(result);
 });
 
+const getInscriptions = expressAsyncHandler(async (req, res) => {
+    const { status, result } = await inscriptionService.getInscriptions(req);
+    return res.status(status).json(result);
+});
+
 module.exports = {
     createInscription,
+    getInscriptions
 }

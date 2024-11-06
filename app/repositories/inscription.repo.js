@@ -19,6 +19,7 @@ const findUserInscriptions = async (user_email) => {
     return resp;
 }
 
+
 module.exports = {
     createInscription,
     findInscription,

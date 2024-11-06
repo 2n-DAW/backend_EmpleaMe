@@ -16,6 +16,14 @@ const createInscription = async (data) => {
     return resp(201, res.toInscriptionResponse());
 };
 
+const getInscriptions = async (req) => {
+    const user_email = req.userEmail;
+    const res = await inscriptionRepo.findUserInscriptions(user_email);
+
+    return resp(200, res.map((inscription) => inscription.toInscriptionResponse()));
+}
+
 module.exports = {
     createInscription,
+    getInscriptions
 }
