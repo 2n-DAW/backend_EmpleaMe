@@ -1,5 +1,6 @@
 const companyProfileRepo = require('../repositories/companyProfile.repo.js');
 const jobRepo = require('../repositories/job.repo.js');
+const inscriptionRepo = require('../repositories/inscription.repo.js');
 const { resp } = require("../utils/utils.js");
 
 
@@ -74,9 +75,12 @@ const getUserLikes = async (req) => {
     const user = await companyProfileRepo.getUserProfile({ username });
     if (!user) return resp(404, { message: "Usuario no encontrado" });
 
+    const userInscriptions = await inscriptionRepo.findUserInscriptions(user.email);
+
     let jobs = await Promise.all(user.favouriteJobs.map(async (jobId) => {
         const job = await jobRepo.findOneJob({ _id: jobId });
-        return await job.toJobResponse(user);
+        const inscription = userInscriptions.find(inscription => inscription.job === job.slug);
+        return await job.toJobResponse(user, inscription ? inscription.status : 0);
     }));
 
     return resp(200, { jobs, jobs_count: jobs.length, is_owner: req.same_User });
