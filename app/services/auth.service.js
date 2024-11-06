@@ -89,23 +89,17 @@ const getCurrentUser = async (req) => {
 const updateUser = async (req) => {
     const { user } = req.body;
 
-    // confirm data
     if (!user) return resp(400, { message: "Datos a actualizar necesarios" });
-
-    const email = req.userEmail;
     const userId = req.userId;
+    let updatedUser;
 
     if (user.username || user.email || user.password) {
-        const updatedUser = await authRepo.updateUser(userId, user);
+        updatedUser = await authRepo.updateUser(userId, user);
+        console.log('updatedUser', updatedUser);
         if (!updatedUser) return resp(404, { message: "Usuario no encontrado" });
     }
-
-    if (user.username || user.email || user.bio || user.image) {
-        updatedClientUser = await authRepo.updateClientUser({ userId }, user);
-        if (!updatedClientUser) return resp(404, { message: "Usuario no encontrado" });
-    }
-
-    return resp(200, { user: updatedClientUser.toClientUserResponse() });
+    const { password, ...respObject } = updatedUser.toObject();
+    return resp(200, { user: respObject });
 };
 
 // LOGOUT

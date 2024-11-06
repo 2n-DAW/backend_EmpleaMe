@@ -34,9 +34,12 @@ const getCurrentUser = async (idObject) => {
 const updateUser = async (idObject, user) => {
     const updatedUser = await userModel.findById(idObject);
     
+    console.log(updatedUser);
+
     if (updatedUser) {
         if (user.username) updatedUser.username = user.username;
         if (user.email) updatedUser.email = user.email;
+        if (typeof user.bio !== 'undefined') updatedUser.bio = user.bio;
         if (user.password) updatedUser.password = await bcrypt.hash(user.password, 10);
         return await updatedUser.save();
     }
@@ -46,8 +49,11 @@ const updateUser = async (idObject, user) => {
 
 // UPDATE USER CLIENT
 const updateClientUser = async (idObject, user) => {
+
     const updatedClientUser = await clientUserModel.findOne(idObject);
     
+
+
     if (updatedClientUser) {
         if (user.username) updatedClientUser.username = user.username;
         if (user.email) updatedClientUser.email = user.email;
@@ -58,6 +64,9 @@ const updateClientUser = async (idObject, user) => {
 
     return null;
 };
+
+
+
 
 // FIND BY ID USER MODEL
 const findById = async (id) => {
