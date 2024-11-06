@@ -7,7 +7,7 @@ const getProfile = async (req) => {
     const { username } = req.params;
     const loggedin = req.loggedin;
     
-    const user = await companyProfileRepo.getClientProfile({ username });
+    const user = await companyProfileRepo.getUserProfile({ username });
 
     if (!user) {
         return resp(404, { message: "Usuario no encontrado" });
@@ -26,12 +26,12 @@ const followUser = async (req) => {
     const { username } = req.params;
 
     const loginUser = await companyProfileRepo.getUserProfile({ email: req.userEmail });
-    const user = await companyProfileRepo.getClientProfile({ username });
+    const user = await companyProfileRepo.getUserProfile({ username });
 
     if (!user || !loginUser) {
         return resp(404, { message: "Usuario no encontrado" });
     }
-    await companyProfileRepo.followUser(loginUser, user.userId);
+    await companyProfileRepo.followUser(loginUser, user._id);
 
     return resp(200, { profile: user.toProfileJSON(loginUser) });
 };
@@ -41,12 +41,12 @@ const unFollowUser = async (req) => {
     const { username } = req.params;
 
     const loginUser = await companyProfileRepo.getUserProfile({ email: req.userEmail });
-    const user = await companyProfileRepo.getClientProfile({ username });
+    const user = await companyProfileRepo.getUserProfile({ username });
 
     if (!user || !loginUser) {
         return resp(404, { message: "Usuario no encontrado" });
     }
-    await companyProfileRepo.unFollowUser(loginUser, user.userId);
+    await companyProfileRepo.unFollowUser(loginUser, user._id);
 
     return resp(200, { profile: user.toProfileJSON(loginUser) });
 };

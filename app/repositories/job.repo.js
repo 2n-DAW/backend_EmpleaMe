@@ -39,7 +39,7 @@ const findAllJobs = async (params) => {
     province != "" && (query.id_province = province);
 
     if (author) {
-        const authorFind = await authRepo.findOne({username: author});
+        const authorFind = await authRepo.findOneUserModel({username: author});
         if (authorFind) {
             author = authorFind._id;
         }

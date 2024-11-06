@@ -78,13 +78,4 @@ ClientUserSchema.methods.toClientUserResponse = function(accessToken) {
     }
 };
 
-ClientUserSchema.methods.toProfileJSON = function (user) {
-    return {
-        username: this.username,
-        bio: this.bio,
-        image: this.image,
-        following: user ? user.isFollowing(this.userId) : false
-    }
-};
-
 module.exports = mongoose.model('ClientUser', ClientUserSchema);

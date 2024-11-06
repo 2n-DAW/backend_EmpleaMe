@@ -43,8 +43,8 @@ const findOneJob = async (req) => {
     let res = {};
     if (req.loggedin) {
         const loginUser = await authRepo.findById(req.userId);
-        const userInscriptions = await inscriptionRepo.findUserInscriptions(req.userEmail);
 
+        const userInscriptions = await inscriptionRepo.findUserInscriptions(req.userEmail);
         const inscription = userInscriptions.find(inscription => inscription.job === job.slug);
 
         res = { job: await job.toJobResponse(loginUser, inscription ? inscription.status : 0) };
@@ -93,7 +93,6 @@ const findAllJobs = async (req) => {
 
 const getJobsByCategory = async (params) => {
     const category = await categoryRepo.findOneCategory(params);
-
     if (!category) return resp(404, { message: "Categoria no encontrada" });
 
     const res = await Promise.all(category.jobs.map(async jobId => {
@@ -141,12 +140,16 @@ const deleteOneJob = async (req) => {
 const favoriteJob = async (req) => {
     const idUser = req.userId;
     const { slug } = req.params;
+
     const loginUser = await authRepo.findById(idUser);
     if (!loginUser) return resp(404, { message: "Usuario no encontrado" });
+
     const job = await jobRepo.findOneJob({ slug });
     if (!job) return resp(404, { message: "Trabajo no encontrado" });
+
     await authRepo.favorite(loginUser, job._id);
     const updatedJob = await jobRepo.updateFavoriteCount(job);
+
     return resp(200, { job: await jobRepo.toJobResponse(updatedJob, loginUser) });
 };
 
@@ -154,12 +157,16 @@ const favoriteJob = async (req) => {
 const unfavoriteJob = async (req) => {
     const idUser = req.userId;
     const { slug } = req.params;
+
     const loginUser = await authRepo.findById(idUser);
     if (!loginUser) return resp(404, { message: "Usuario no encontrado" });
+
     const job = await jobRepo.findOneJob({ slug });
     if (!job) return resp(404, { message: "Trabajo no encontrado" });
+
     await authRepo.unfavorite(loginUser, job._id);
     const updatedJob = await jobRepo.updateFavoriteCount(job);
+
     return resp(200, { job: await jobRepo.toJobResponse(updatedJob, loginUser) });
 };
 

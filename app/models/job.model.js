@@ -75,7 +75,8 @@ JobSchema.methods.slugify = async function () {
 };
 
 JobSchema.methods.toJobResponse = async function (user, status) {
-    const authorObj = await authRepo.findOne({ userId: this.author });
+    const authorObj = await authRepo.findOneUserModel({ _id: this.author });
+
     return {
         slug: this.slug,
         name: this.name,

@@ -13,7 +13,6 @@ const clientUserLogin = asyncHandler(async (req, res) => {
 
 
 const registerUser = asyncHandler(async (req, res) => {
-    console.log(req.body);
     const { status, result } = await authService.registerUser(req.body);
     return res.status(status).json(result);
 });

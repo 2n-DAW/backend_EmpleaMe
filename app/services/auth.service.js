@@ -27,22 +27,22 @@ const userType = async (data) => {
 // LOGIN
 const clientUserLogin = async (data) => {
     const { user } = data;
-    console.log('data', data);
+
     // confirm data
     if (!user || !user.email || !user.password) {
         return resp(404, { message: "Usuario no encontrado" });
     }
-    console.log(user.email);
-    const loginUser = await authRepo.clientUserLogin({ email: user.email });
-    console.log('loginUser', loginUser);
+
+    const loginUser = await authRepo.clientUserLogin({ email: user.email })
     if (!loginUser) return resp(404, { message: "Usuario no encontrado" });
 
     const accessToken = await loginUser.generateAccessToken();
     const refreshToken = await loginUser.generateRefreshToken();
 
     // Guarda el refreshToken en la base de datos junto el idUser
+    console.log("loginUser que genera tokens =======================",loginUser)
     await authRepo.saveToken(refreshToken, accessToken, loginUser.userId);
-
+    
     const res = loginUser.toClientUserResponse(accessToken);
     return resp(200, { user: res });
 };
