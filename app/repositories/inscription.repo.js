@@ -19,9 +19,14 @@ const findUserInscriptions = async (user_email) => {
     return resp;
 }
 
+const deleteInscription = async (user_email, job) => {
+    return await inscriptionModel.deleteOne({ user_email, job });
+}
+
 
 module.exports = {
     createInscription,
     findInscription,
-    findUserInscriptions
+    findUserInscriptions,
+    deleteInscription
 }

@@ -23,7 +23,16 @@ const getInscriptions = async (req) => {
     return resp(200, res.map((inscription) => inscription.toInscriptionResponse()));
 }
 
+const deleteInscription = async (req) => {
+    const user_email = req.userEmail;
+    const { job } = req.body.inscription;
+    const res = await inscriptionRepo.deleteInscription(user_email, job);
+
+    return resp(200, res);
+}
+
 module.exports = {
     createInscription,
-    getInscriptions
+    getInscriptions,
+    deleteInscription
 }

@@ -11,7 +11,13 @@ const getInscriptions = expressAsyncHandler(async (req, res) => {
     return res.status(status).json(result);
 });
 
+const deleteInscription = expressAsyncHandler(async (req, res) => {
+    const { status, result } = await inscriptionService.deleteInscription(req);
+    return res.status(status).json(result);
+});
+
 module.exports = {
     createInscription,
-    getInscriptions
+    getInscriptions,
+    deleteInscription
 }
