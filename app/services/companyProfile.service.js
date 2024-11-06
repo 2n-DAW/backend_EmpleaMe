@@ -110,6 +110,25 @@ const getUserFollowing = async (req) => {
     return resp(200, { users: following, users_count: following.length, is_owner: req.same_User });
 };
 
+const getProfileByEmail = async (req) => {
+    const { email } = req.params;
+    const loggedin = req.loggedin;
+
+    const user = await companyProfileRepo.getUserProfile({ email });
+
+    console.log(user);
+    if (!user) {
+        return resp(404, { message: "Usuario no encontrado" });
+    }
+
+    if (!loggedin) {
+        return resp(200, { profile: user.toProfileJSON(false) });
+    } else {
+        const loginUser = await companyProfileRepo.getUserProfile({ email: req.userEmail });
+        return resp(200, { profile: user.toProfileJSON(loginUser) });
+    }
+}
+
 module.exports = {
     getProfile,
     followUser,
@@ -117,5 +136,6 @@ module.exports = {
     getUserJobs,
     getUserLikes,
     getUserFollowers,
-    getUserFollowing
+    getUserFollowing,
+    getProfileByEmail
 }
