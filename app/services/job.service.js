@@ -7,8 +7,8 @@ const inscriptionRepo = require('../repositories/inscription.repo.js');
 
 const createJob = async (req) => {
     const id = req.userId;
-    const { name, description, salary, images, img, id_cat, id_contract, id_workingDay, id_province } = req.body;
-
+    const { name, description, salary, images, img, id_cat, id_contract, id_workingDay, id_province } = req.body.job;
+    console.log(name, description, salary, images, img, id_cat, id_contract, id_workingDay, id_province);
     const author = await authRepo.findById(id);
     if (!author) return resp(404, { message: "Usuario no logeado" });
     const category = await categoryRepo.findOneCategory({ id_cat });
@@ -18,7 +18,7 @@ const createJob = async (req) => {
         name: name || null,
         description: description || null,
         salary: salary || null,
-        images: images,
+        images: images || [],
         img: img || null,
         id_cat: id_cat || null,
         id_contract: id_contract || null,
@@ -27,11 +27,14 @@ const createJob = async (req) => {
         author: id
     };
 
-    const { newJob } = await jobRepo.createJob(job_data);
-    if (!newJob) return resp(400, { message: "No se pudo crear el trabajo" });
+    console.log(job_data);
 
-    await category.addJob(newJob._id); //añadir trabajo a la categoría
-    return resp(201, await newJob.toJobResponse(author));
+    const res = await jobRepo.createJob(job_data);
+
+    if (!res) return resp(400, { message: "No se pudo crear el trabajo" });
+
+    await category.addJob(res._id); //añadir trabajo a la categoría
+    return resp(201, await res.toJobResponse(author));
 };
 
 
