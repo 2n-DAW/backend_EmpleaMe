@@ -39,8 +39,6 @@ const clientUserLogin = async (data) => {
     const accessToken = await loginUser.generateAccessToken();
     const refreshToken = await loginUser.generateRefreshToken();
 
-    // Guarda el refreshToken en la base de datos junto el idUser
-    console.log("loginUser que genera tokens =======================",loginUser)
     await authRepo.saveToken(refreshToken, accessToken, loginUser.userId);
     
     const res = loginUser.toClientUserResponse(accessToken);
@@ -50,9 +48,6 @@ const clientUserLogin = async (data) => {
 // REGISTER
 const registerUser = async (data) => {
     const { user, userType } = data;
-
-    console.log('data', data);
-
     // confirm data
     if (!user || !user.email || !user.username || !user.password) {
         return resp(400, { message: "Todos los campos son necesarios" });
@@ -95,7 +90,6 @@ const updateUser = async (req) => {
 
     if (user.username || user.email || user.password) {
         updatedUser = await authRepo.updateUser(userId, user);
-        console.log('updatedUser', updatedUser);
         if (!updatedUser) return resp(404, { message: "Usuario no encontrado" });
     }
     const { password, ...respObject } = updatedUser.toObject();

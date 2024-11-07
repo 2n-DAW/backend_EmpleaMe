@@ -15,7 +15,7 @@ const findOneJob = async (params) => {
 
 const findAllJobs = async (params) => {
     let { limit, offset, category, contract, workingDay, province, name, salary_min, salary_max, author } = params;
-    const name_regex = new RegExp(name);
+    const name_regex = new RegExp(name, 'i');
 
     limit = isNotUndefined(limit) ? parseInt(limit) : 3;
     offset = isNotUndefined(offset) ? parseInt(offset) : 0;

@@ -116,7 +116,6 @@ const getProfileByEmail = async (req) => {
 
     const user = await companyProfileRepo.getUserProfile({ email });
 
-    console.log(user);
     if (!user) {
         return resp(404, { message: "Usuario no encontrado" });
     }

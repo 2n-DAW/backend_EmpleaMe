@@ -8,7 +8,6 @@ const inscriptionRepo = require('../repositories/inscription.repo.js');
 const createJob = async (req) => {
     const id = req.userId;
     const { name, description, salary, images, img, id_cat, id_contract, id_workingDay, id_province } = req.body.job;
-    console.log(name, description, salary, images, img, id_cat, id_contract, id_workingDay, id_province);
     const author = await authRepo.findById(id);
     if (!author) return resp(404, { message: "Usuario no logeado" });
     const category = await categoryRepo.findOneCategory({ id_cat });
@@ -27,7 +26,6 @@ const createJob = async (req) => {
         author: id
     };
 
-    console.log(job_data);
 
     const res = await jobRepo.createJob(job_data);
 
@@ -61,10 +59,13 @@ const findOneJob = async (req) => {
 
 
 const findAllJobs = async (req) => {
-    const { jobs, job_count } = await jobRepo.findAllJobs(req.query);
+    let { name } = req.query;
+    name = name || '';
+    name = name.endsWith('?') ?  name.slice(0, -1) : name;
+    const query = {...req.query, name};
+    const { jobs, job_count } = await jobRepo.findAllJobs(query);
 
     if (!jobs) return resp(404, { message: "No se encontraron trabajos" });
-
 
     let res = {};
     if (req.loggedin) {

@@ -11,12 +11,7 @@ const findInscription = async (user_email, job) => {
 };
 
 const findUserInscriptions = async (user_email) => {
-    console.log('user_email', user_email);
-
-    const resp = await inscriptionModel.find({ user_email: user_email });
-
-    console.log(resp);
-    return resp;
+   return await inscriptionModel.find({ user_email: user_email });
 }
 
 const deleteInscription = async (user_email, job) => {

@@ -33,8 +33,6 @@ const getCurrentUser = async (idObject) => {
 // UPDATE USER
 const updateUser = async (idObject, user) => {
     const updatedUser = await userModel.findById(idObject);
-    
-    console.log(updatedUser);
 
     if (updatedUser) {
         if (user.username) updatedUser.username = user.username;
