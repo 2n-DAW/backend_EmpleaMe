@@ -89,9 +89,30 @@ const getUserComments = async (req) => {
     return resp(200, { comments });
 };
 
+const deleteCommentById = async (req) => {
+    const userId = req.userId;
+    const commentId = req.params.id;
+
+    const comment = await commentRepo.findById(commentId);
+    if (!comment) return resp(404, { message: "Comment not found" });
+    
+    if (comment.author.toString() === userId) {
+        await commentRepo.deleteOne(commentId);
+        const job = await jobRepo.findOneJob({ _id: comment.job });
+        await jobRepo.removeComment(job, commentId);
+        return resp(200, { message: "Comment has been deleted" });
+    } else {
+        
+        return resp(403, { error: "Only the author of the comment can delete the comment" });
+    }
+}
+
+    
+
 module.exports = {
     addCommentsToJob,
     getCommentsFromJob,
     deleteComment,
-    getUserComments
+    getUserComments,
+    deleteCommentById
 }
