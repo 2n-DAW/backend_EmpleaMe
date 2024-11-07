@@ -17,10 +17,15 @@ const deleteOne = async (id) => {
     return await commentModel.deleteOne({ _id: id });
 }
 
+const findUserComments = async (userId) => {
+    console.log(userId);
+    return await commentModel.find({ author: userId });
+}
 
 module.exports = {
     createComment,
     toCommentResponse,
     findById,
-    deleteOne
+    deleteOne,
+    findUserComments
 }

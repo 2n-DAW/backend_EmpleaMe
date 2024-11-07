@@ -33,7 +33,7 @@ const getCommentsFromJob = async (req) => {
     const loggedin = req.loggedin;
     const userId = req.userId;
 
-    const job = await jobRepo.findOneJob({slug});
+    const job = await jobRepo.findOneJob({ slug });
     if (!job) return resp(404, { message: "Trabajo no encontrado" });
 
     if (loggedin) {
@@ -43,7 +43,7 @@ const getCommentsFromJob = async (req) => {
                 const commentObj = await commentRepo.findById(commentId);
                 return await commentObj.toCommentResponse(loginUser);
             })))
-            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Ordenar por fecha descendente
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Ordenar por fecha descendente
         };
     } else {
         res = {
@@ -51,7 +51,7 @@ const getCommentsFromJob = async (req) => {
                 const commentObj = await commentRepo.findById(commentId);
                 return await commentObj.toCommentResponse(false);
             })))
-            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Ordenar por fecha descendente
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Ordenar por fecha descendente
         };
     }
 
@@ -68,7 +68,7 @@ const deleteComment = async (req) => {
 
     const job = await jobRepo.findOneJob({ slug });
     if (!job) return resp(404, { message: "Job not found" });
-    
+
     const comment = await commentRepo.findById(id);
     if (comment.author.toString() === commenter._id.toString()) {
         await jobRepo.removeComment(job, comment._id);
@@ -80,8 +80,18 @@ const deleteComment = async (req) => {
 
 }
 
+
+const getUserComments = async (req) => {
+    const userId = req.userId;
+    const comments = await commentRepo.findUserComments(userId);
+    console.log(comments);
+    if (!comments) return resp(404, { message: "No comments found" });
+    return resp(200, { comments });
+};
+
 module.exports = {
     addCommentsToJob,
     getCommentsFromJob,
-    deleteComment
+    deleteComment,
+    getUserComments
 }
