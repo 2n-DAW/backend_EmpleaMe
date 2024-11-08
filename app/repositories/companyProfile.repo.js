@@ -29,8 +29,8 @@ const getUserFollowers = async (user, query) => {
     // Añadimos al objeto followerUsers los campos image y bio de followerClientUsers
     const result = followerUsers.map(follower => {
         const followerData = follower._doc
-        const clientUser = followerClientUsers.find(cu => cu.userId.toString() === follower._id.toString());
-        return { ...followerData, image: clientUser.image, bio: clientUser.bio };
+        const user = followerUsers.find(cu => cu._id.toString() === follower._id.toString());
+        return { ...followerData, image: user.image, bio: user.bio };
     });
     return result;
 };
