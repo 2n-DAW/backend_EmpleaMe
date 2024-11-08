@@ -138,6 +138,11 @@ const userDelete = async (username) => {
     return await userModel.findOneAndDelete({ username });
 };
 
+const findOneUser = async (username) => {
+    const resp = await userModel.findOne(username);
+    return resp;
+};
+
 
 module.exports = {
     userType,
@@ -157,4 +162,6 @@ module.exports = {
     favorite,
     unfavorite,
     userDelete,
+    findOneUser
+    
 }
