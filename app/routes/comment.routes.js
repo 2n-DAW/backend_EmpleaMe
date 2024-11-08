@@ -1,4 +1,4 @@
-const { addCommentsToJob, getCommentsFromJob, deleteComment, getUserComments, deleteCommentById} = require('../controllers/comment.controller');
+const { addCommentsToJob, getCommentsFromJob, deleteComment, getUserComments, deleteCommentById, getCommentsByUsername} = require('../controllers/comment.controller');
 const verifyJWT = require('../middleware/verifyJWT');
 const verifyJWTOptional = require('../middleware/verifyJWTOptional');
 
@@ -14,4 +14,6 @@ module.exports = (app) => {
     app.get('/comments', verifyJWT, getUserComments);
     
     app.delete('/comments/:id', verifyJWT, deleteCommentById);
+    
+    app.get('/comments/username/:username', getCommentsByUsername);
 }
