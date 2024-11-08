@@ -111,11 +111,20 @@ const getCommentsByUsername = async (req) => {
     const { username } = req.params;
     const user = await authRepo.findOneUser({ username });
     if (!user) return resp(404, { message: "User not found" });
-
+    
     const comments = await commentRepo.findUserComments(user._id);
     if (!comments) return resp(404, { message: "No comments found" });
+    
+    console.log(comments)
+    
+    const res = comments.map((comment)=>{
+        comment.author = user
+        return comment;
+    })
+    
+    console.log(res);
 
-    return resp(200, { comments });
+    return resp(200, { comments: res});
 }
 
     
