@@ -54,7 +54,7 @@ const getCommentsFromJob = async (req) => {
                 .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Ordenar por fecha descendente
         };
     }
-
+    console.log(res);
     return resp(200, res);
 };
 
@@ -83,10 +83,16 @@ const deleteComment = async (req) => {
 
 const getUserComments = async (req) => {
     const userId = req.userId;
+    const loginUser = await authRepo.findById(userId);
+    
     const comments = await commentRepo.findUserComments(userId);
-    console.log(comments);
     if (!comments) return resp(404, { message: "No comments found" });
-    return resp(200, { comments });
+
+    const res = await Promise.all(comments.map(async comment => {
+        return await comment.toCommentResponse(loginUser);
+    }));
+
+    return resp(200, res);
 };
 
 const deleteCommentById = async (req) => {
