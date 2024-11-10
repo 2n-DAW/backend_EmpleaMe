@@ -19,9 +19,27 @@ const deleteComment = asyncHandler(async (req, res) => {
     return res.status(status).json(result);
 });
 
+const getUserComments = asyncHandler(async (req, res) => {
+    const { status, result } = await commentService.getUserComments(req);
+    return res.status(status).json(result);
+});
+
+const deleteCommentById = asyncHandler(async (req, res) => {
+    const { status, result } = await commentService.deleteCommentById(req);
+    return res.status(status).json(result);
+});
+
+const getCommentsByUsername = asyncHandler(async (req, res) => {
+    const { status, result } = await commentService.getCommentsByUsername(req);
+    return res.status(status).json(result);
+});
+
 
 module.exports = {
     addCommentsToJob,
     getCommentsFromJob,
-    deleteComment
+    deleteComment,
+    getUserComments,
+    deleteCommentById,
+    getCommentsByUsername
 };

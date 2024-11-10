@@ -21,7 +21,8 @@ const commentSchema = new mongoose.Schema({
 
 
 commentSchema.methods.toCommentResponse = async function (user) {
-    const authorObj = await authRepo.findOne({ userId: this.author });
+    const authorObj = await authRepo.findOneUserModel({ _id: this.author });
+
     return {
         id: this._id,
         body: this.body,

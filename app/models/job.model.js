@@ -74,8 +74,9 @@ JobSchema.methods.slugify = async function () {
     this.slug = slugify(this.name) + '-' + (Math.random() * Math.pow(36, 10) | 0).toString(36);
 };
 
-JobSchema.methods.toJobResponse = async function (user) {
-    const authorObj = await authRepo.findOne({ userId: this.author });
+JobSchema.methods.toJobResponse = async function (user, status) {
+    const authorObj = await authRepo.findOneUserModel({ _id: this.author });
+
     return {
         slug: this.slug,
         name: this.name,
@@ -91,7 +92,8 @@ JobSchema.methods.toJobResponse = async function (user) {
         createdAt: this.createdAt,
         updatedAt: this.updatedAt,
         favorited: user ? user.isFavourite(this._id) : false,
-        favoritesCount: this.favouritesCount
+        favoritesCount: this.favouritesCount,
+        isInscripted: status
     }
 }
 

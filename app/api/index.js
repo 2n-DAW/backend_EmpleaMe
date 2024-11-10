@@ -14,6 +14,7 @@ const corsOptions = {
     origin: CORSURL,
     optionsSuccessStatus: 200
 };
+console.log(CORSURL);
 
 app.use(cors(corsOptions));
 

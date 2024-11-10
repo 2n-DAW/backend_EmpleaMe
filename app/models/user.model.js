@@ -3,16 +3,10 @@ const uniqueValidator = require('mongoose-unique-validator');
 
 const UserSchema = mongoose.Schema({
 
-    _id: {
-        type: mongoose.Schema.Types.ObjectId,
-        auto: true
-    },
-
     username: {
         type: String,
         required: true,
         unique: true,
-        lowercase: true
     },
     email: {
         type: String,
@@ -25,6 +19,14 @@ const UserSchema = mongoose.Schema({
     password: {
         type: String,
         required: true
+    },
+    bio: {
+        type: String,
+        default: ""
+    },
+    image: {
+        type: String,
+        default: "https://static.productionready.io/images/smiley-cyrus.jpg"
     },
     userType: {
         type: String,
@@ -55,6 +57,16 @@ UserSchema.methods.toUserResponse = function() {
     return {
         email: this.email,
         userType: this.userType
+    }
+};
+
+UserSchema.methods.toProfileJSON = function (user) {
+    const isFollowing = user && user instanceof mongoose.model('User') && user.isFollowing(this._id);
+    return {
+        username: this.username,
+        bio: this.bio,
+        image: this.image,
+        following: isFollowing || false
     }
 };
 

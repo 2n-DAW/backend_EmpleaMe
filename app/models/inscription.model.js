@@ -14,10 +14,10 @@ const InscriptionSchema = mongoose.Schema({
         type: Number,
         required: true
     },
-    date: {
-        type: Date,
-        required: true
-    },
+    // date: {
+    //     type: Date,
+    //     required: true
+    // },
 },
     {
         timestamps: true
@@ -32,7 +32,7 @@ InscriptionSchema.methods.toInscriptionResponse = function () {
         job: this.job,
         user_email: this.user_email,
         status: this.status,
-        date: this.date
+        date: this.createdAt
     };
 };
 

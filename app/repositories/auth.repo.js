@@ -4,12 +4,13 @@ const tokenModel = require('../models/token.model.js');
 const blacklistModel = require('../models/blacklist.model.js');
 const bcrypt = require('bcrypt');
 
+
 // USER TYPE
 const userType = async (emailObject) => {
     return await userModel.findOne(emailObject);
 };
 
-// LOGIN
+// LOGIN CLIENT USER
 const clientUserLogin = async (emailObject) => {
     return await clientUserModel.findOne(emailObject);
 };
@@ -21,7 +22,6 @@ const registerUser = async (user) => {
 
 // REGISTER CLIENT USER
 const registerClientUser = async (clientUser) => {
-    console.log("sdfasdfsdafsadf", clientUser);
     return await clientUserModel.create(clientUser);
 };
 
@@ -33,10 +33,11 @@ const getCurrentUser = async (idObject) => {
 // UPDATE USER
 const updateUser = async (idObject, user) => {
     const updatedUser = await userModel.findById(idObject);
-    
+
     if (updatedUser) {
         if (user.username) updatedUser.username = user.username;
         if (user.email) updatedUser.email = user.email;
+        if (typeof user.bio !== 'undefined') updatedUser.bio = user.bio;
         if (user.password) updatedUser.password = await bcrypt.hash(user.password, 10);
         return await updatedUser.save();
     }
@@ -46,8 +47,11 @@ const updateUser = async (idObject, user) => {
 
 // UPDATE USER CLIENT
 const updateClientUser = async (idObject, user) => {
+
     const updatedClientUser = await clientUserModel.findOne(idObject);
     
+
+
     if (updatedClientUser) {
         if (user.username) updatedClientUser.username = user.username;
         if (user.email) updatedClientUser.email = user.email;
@@ -59,14 +63,17 @@ const updateClientUser = async (idObject, user) => {
     return null;
 };
 
-// FIND BY ID
+
+
+
+// FIND BY ID USER MODEL
 const findById = async (id) => {
-    return await userModel.findById(id);
+    return await userModel.findOne({ _id: id });
 };
 
-// FIND ONE
-const findOne = async (data) => {
-    return await clientUserModel.findOne(data);
+// FIND ONE USER MODEL
+const findOneUserModel = async (data) => {
+    return await userModel.findOne(data);
 };
 
 // SAVE TOKEN
@@ -113,19 +120,27 @@ const createBlacklistToken = async (refresh) => {
 const deleteOneRefresh = async (refresh) => {
     return await tokenModel.deleteOne({ refreshToken: refresh });
 }
+
 // FAVORITE
 const favorite = async (user, jobId) => {
-
+    // const userInstance = user instanceof userModel ? user : new userModel(user);
     return await user.favorite(jobId);
 };
 
 // UNFAVORITE
 const unfavorite = async (user, jobId) => {
+    // const userInstance = user instanceof userModel ? user : userModel.hydrate(user);
     return await user.unfavorite(jobId);
 };
 
+// DELETE USER MODEL
 const userDelete = async (username) => {
     return await userModel.findOneAndDelete({ username });
+};
+
+const findOneUser = async (username) => {
+    const resp = await userModel.findOne(username);
+    return resp;
 };
 
 
@@ -138,7 +153,7 @@ module.exports = {
     updateUser,
     updateClientUser,
     findById,
-    findOne,
+    findOneUserModel,
     saveToken,
     findOneToken,
     isBlacklisted,
@@ -146,5 +161,7 @@ module.exports = {
     deleteOneRefresh,
     favorite,
     unfavorite,
-    userDelete
+    userDelete,
+    findOneUser
+    
 }

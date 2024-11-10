@@ -33,7 +33,7 @@ const getCommentsFromJob = async (req) => {
     const loggedin = req.loggedin;
     const userId = req.userId;
 
-    const job = await jobRepo.findOneJob({slug});
+    const job = await jobRepo.findOneJob({ slug });
     if (!job) return resp(404, { message: "Trabajo no encontrado" });
 
     if (loggedin) {
@@ -43,7 +43,7 @@ const getCommentsFromJob = async (req) => {
                 const commentObj = await commentRepo.findById(commentId);
                 return await commentObj.toCommentResponse(loginUser);
             })))
-            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Ordenar por fecha descendente
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Ordenar por fecha descendente
         };
     } else {
         res = {
@@ -51,10 +51,10 @@ const getCommentsFromJob = async (req) => {
                 const commentObj = await commentRepo.findById(commentId);
                 return await commentObj.toCommentResponse(false);
             })))
-            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Ordenar por fecha descendente
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Ordenar por fecha descendente
         };
     }
-
+    console.log(res);
     return resp(200, res);
 };
 
@@ -68,7 +68,7 @@ const deleteComment = async (req) => {
 
     const job = await jobRepo.findOneJob({ slug });
     if (!job) return resp(404, { message: "Job not found" });
-    
+
     const comment = await commentRepo.findById(id);
     if (comment.author.toString() === commenter._id.toString()) {
         await jobRepo.removeComment(job, comment._id);
@@ -80,8 +80,66 @@ const deleteComment = async (req) => {
 
 }
 
+
+const getUserComments = async (req) => {
+    const userId = req.userId;
+    const loginUser = await authRepo.findById(userId);
+    
+    const comments = await commentRepo.findUserComments(userId);
+    if (!comments) return resp(404, { message: "No comments found" });
+
+    const res = await Promise.all(comments.map(async comment => {
+        return await comment.toCommentResponse(loginUser);
+    }));
+
+    return resp(200, res);
+};
+
+const deleteCommentById = async (req) => {
+    const userId = req.userId;
+    const commentId = req.params.id;
+
+    const comment = await commentRepo.findById(commentId);
+    if (!comment) return resp(404, { message: "Comment not found" });
+    
+    if (comment.author.toString() === userId) {
+        await commentRepo.deleteOne(commentId);
+        const job = await jobRepo.findOneJob({ _id: comment.job });
+        await jobRepo.removeComment(job, commentId);
+        return resp(200, { message: "Comment has been deleted" });
+    } else {
+        
+        return resp(403, { error: "Only the author of the comment can delete the comment" });
+    }
+}
+
+const getCommentsByUsername = async (req) => {
+    const { username } = req.params;
+    const user = await authRepo.findOneUser({ username });
+    if (!user) return resp(404, { message: "User not found" });
+    
+    const comments = await commentRepo.findUserComments(user._id);
+    if (!comments) return resp(404, { message: "No comments found" });
+    
+    console.log(comments)
+    
+    const res = comments.map((comment)=>{
+        comment.author = user
+        return comment;
+    })
+    
+    console.log(res);
+
+    return resp(200, { comments: res});
+}
+
+    
+
 module.exports = {
     addCommentsToJob,
     getCommentsFromJob,
-    deleteComment
+    deleteComment,
+    getUserComments,
+    deleteCommentById,
+    getCommentsByUsername
 }

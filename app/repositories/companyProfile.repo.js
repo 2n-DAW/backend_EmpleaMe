@@ -29,8 +29,8 @@ const getUserFollowers = async (user, query) => {
     // Añadimos al objeto followerUsers los campos image y bio de followerClientUsers
     const result = followerUsers.map(follower => {
         const followerData = follower._doc
-        const clientUser = followerClientUsers.find(cu => cu.userId.toString() === follower._id.toString());
-        return { ...followerData, image: clientUser.image, bio: clientUser.bio };
+        const user = followerUsers.find(cu => cu._id.toString() === follower._id.toString());
+        return { ...followerData, image: user.image, bio: user.bio };
     });
     return result;
 };
@@ -41,13 +41,13 @@ const getUserFollowing = async (user, query) => {
     const followingUsers = await userModel.find({ _id: { $in: user.followingUsers } }, {}, { skip: Number(offset), limit: Number(limit) });
     // Extraemos los ids de los followings en User
     const followingUserIds = followingUsers.map(following => following._id);
-    // Buscamos esos ids en ClientUser
-    const followingClientUsers = await clientUserModel.find({ userId: { $in: followingUserIds } }).select('userId image bio');
-    // Añadimos al objeto followingUsers los campos image y bio de followingClientUsers
+    // Buscamos esos ids en follower
+    const followerUser = await userModel.find({ _id: { $in: followingUserIds } }).select('userId image bio');
+    // Añadimos al objeto followingUsers los campos image y bio de followerUsers
     const result = followingUsers.map(following => {
         const followingData = following._doc
-        const clientUser = followingClientUsers.find(cu => cu.userId.toString() === following._id.toString());
-        return { ...followingData, image: clientUser.image, bio: clientUser.bio };
+        const followerData = followerUser.find(cu => cu._id.toString() === following._id.toString());
+        return { ...followingData, image: followerData.image, bio: followerData.bio };
     });
     return result;
 };

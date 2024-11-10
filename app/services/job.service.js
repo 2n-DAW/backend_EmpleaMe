@@ -2,12 +2,12 @@ const jobRepo = require('../repositories/job.repo.js');
 const categoryRepo = require('../repositories/category.repo.js');
 const authRepo = require('../repositories/auth.repo.js');
 const { resp } = require('../utils/utils.js');
+const inscriptionRepo = require('../repositories/inscription.repo.js');
 
 
 const createJob = async (req) => {
     const id = req.userId;
-    const { name, description, salary, images, img, id_cat, id_contract, id_workingDay, id_province } = req.body;
-
+    const { name, description, salary, images, img, id_cat, id_contract, id_workingDay, id_province } = req.body.job;
     const author = await authRepo.findById(id);
     if (!author) return resp(404, { message: "Usuario no logeado" });
     const category = await categoryRepo.findOneCategory({ id_cat });
@@ -17,7 +17,7 @@ const createJob = async (req) => {
         name: name || null,
         description: description || null,
         salary: salary || null,
-        images: images,
+        images: images || [],
         img: img || null,
         id_cat: id_cat || null,
         id_contract: id_contract || null,
@@ -26,11 +26,13 @@ const createJob = async (req) => {
         author: id
     };
 
-    const { newJob } = await jobRepo.createJob(job_data);
-    if (!newJob) return resp(400, { message: "No se pudo crear el trabajo" });
 
-    await category.addJob(newJob._id); //añadir trabajo a la categoría
-    return resp(201, await newJob.toJobResponse(author));
+    const res = await jobRepo.createJob(job_data);
+
+    if (!res) return resp(400, { message: "No se pudo crear el trabajo" });
+
+    await category.addJob(res._id); //añadir trabajo a la categoría
+    return resp(201, await res.toJobResponse(author));
 };
 
 
@@ -39,46 +41,62 @@ const findOneJob = async (req) => {
 
     if (!job) return resp(404, { message: "Trabajo no encontrado" });
 
+    let res = {};
     if (req.loggedin) {
         const loginUser = await authRepo.findById(req.userId);
-        res = { job: await job.toJobResponse(loginUser) };
+
+        const userInscriptions = await inscriptionRepo.findUserInscriptions(req.userEmail);
+        const inscription = userInscriptions.find(inscription => inscription.job === job.slug);
+
+        res = { job: await job.toJobResponse(loginUser, inscription ? inscription.status : 0) };
     } else {
-        res = { job: await job.toJobResponse(false) };
+        res = { job: await job.toJobResponse(false, 0) };
     }
 
     return resp(200, res);
 };
+
 
 
 const findAllJobs = async (req) => {
-    const { jobs, job_count } = await jobRepo.findAllJobs(req.query);
+    let { name } = req.query;
+    name = name || '';
+    name = name.endsWith('?') ?  name.slice(0, -1) : name;
+    const query = {...req.query, name};
+    const { jobs, job_count } = await jobRepo.findAllJobs(query);
 
     if (!jobs) return resp(404, { message: "No se encontraron trabajos" });
 
+    let res = {};
     if (req.loggedin) {
         const loginUser = await authRepo.findById(req.userId);
+        const userInscriptions = await inscriptionRepo.findUserInscriptions(req.userEmail);
+
         res = {
             jobs: await Promise.all(jobs.map(async job => {
-                return await job.toJobResponse(loginUser);
+                const inscription = userInscriptions.find(inscription => inscription.job === job.slug);
+                return await job.toJobResponse(loginUser, inscription ? inscription.status : 0);
             })),
             job_count
         };
+
+        return resp(200, res);
     } else {
         res = {
             jobs: await Promise.all(jobs.map(async job => {
-                return await job.toJobResponse(false);
+                return await job.toJobResponse(false, 0);
             })),
             job_count
         };
-    }
 
-    return resp(200, res);
+        return resp(200, res);
+    }
 };
+
 
 
 const getJobsByCategory = async (params) => {
     const category = await categoryRepo.findOneCategory(params);
-
     if (!category) return resp(404, { message: "Categoria no encontrada" });
 
     const res = await Promise.all(category.jobs.map(async jobId => {
@@ -126,12 +144,16 @@ const deleteOneJob = async (req) => {
 const favoriteJob = async (req) => {
     const idUser = req.userId;
     const { slug } = req.params;
+
     const loginUser = await authRepo.findById(idUser);
     if (!loginUser) return resp(404, { message: "Usuario no encontrado" });
+
     const job = await jobRepo.findOneJob({ slug });
     if (!job) return resp(404, { message: "Trabajo no encontrado" });
+
     await authRepo.favorite(loginUser, job._id);
     const updatedJob = await jobRepo.updateFavoriteCount(job);
+
     return resp(200, { job: await jobRepo.toJobResponse(updatedJob, loginUser) });
 };
 
@@ -139,12 +161,16 @@ const favoriteJob = async (req) => {
 const unfavoriteJob = async (req) => {
     const idUser = req.userId;
     const { slug } = req.params;
+
     const loginUser = await authRepo.findById(idUser);
     if (!loginUser) return resp(404, { message: "Usuario no encontrado" });
+
     const job = await jobRepo.findOneJob({ slug });
     if (!job) return resp(404, { message: "Trabajo no encontrado" });
+
     await authRepo.unfavorite(loginUser, job._id);
     const updatedJob = await jobRepo.updateFavoriteCount(job);
+
     return resp(200, { job: await jobRepo.toJobResponse(updatedJob, loginUser) });
 };
 

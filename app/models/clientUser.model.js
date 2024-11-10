@@ -12,8 +12,7 @@ const ClientUserSchema = mongoose.Schema({
     username: {
         type: String,
         required: true,
-        unique: true,
-        lowercase: true
+        unique: true
     },
     email: {
         type: String,
@@ -75,15 +74,6 @@ ClientUserSchema.methods.toClientUserResponse = function(accessToken) {
         bio: this.bio,
         image: this.image,
         token: accessToken
-    }
-};
-
-ClientUserSchema.methods.toProfileJSON = function (user) {
-    return {
-        username: this.username,
-        bio: this.bio,
-        image: this.image,
-        following: user ? user.isFollowing(this.userId) : false
     }
 };
 

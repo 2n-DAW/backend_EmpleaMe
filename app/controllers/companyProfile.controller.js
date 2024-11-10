@@ -37,6 +37,11 @@ const getUserFollowing = asyncHandler(async (req, res) => {
     return res.status(status).json(result);
 });
 
+const getProfileByEmail = asyncHandler(async (req, res) => {
+    const { status, result } = await companyProfileService.getProfileByEmail(req);
+    return res.status(status).json(result);
+});
+
 module.exports = {
     getProfile,
     followUser,
@@ -44,5 +49,6 @@ module.exports = {
     getUserJobs,
     getUserLikes,
     getUserFollowers,
-    getUserFollowing
+    getUserFollowing,
+    getProfileByEmail
 }
