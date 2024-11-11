@@ -21,7 +21,7 @@ LABEL maintainer="f.montesdoria@gmail.com"
 LABEL version="1.0"
 LABEL description="Docker image for Express.js backend EmpleaMe"
 LABEL repository="https://github.com/2n-DAW/backend_EmpleaMe"
-LABEL build-date="2023-07-01"
+LABEL build-date="10-11-2024"
 
 # Instalar Node.js
 RUN apk add --update nodejs npm
@@ -43,4 +43,4 @@ ENV REFRESH_TOKEN_EXPIRATION=15d
 EXPOSE 3000
 
 # Comando para ejecutar la aplicación
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "start"]
